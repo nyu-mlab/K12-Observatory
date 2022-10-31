@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "scraper"
+requires-python = ">=3.10"
+dependencies = [
+    "pandas",
+    "openpyxl",
+]
+dynamic = ["version"]
+
+[project.optional-dependencies]
+dev = [
+    "yapf",
+    "pylint",
+]
+tests = [
+    "pytest",
+    "pytest-cov",
+    "hypothesis",
+]
+
+[project.scripts]
+scrape = "scraper.scrape:scrape"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+namespaces = true
+where = ["."]
+include = ["scraper"]

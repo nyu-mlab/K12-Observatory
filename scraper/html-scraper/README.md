@@ -9,3 +9,18 @@ Objectives: Given the K12 district websites in /raw-input-data, the scraper visi
 
 Outputs
 `/shared/tim/html-scraper/raw-results/[date]/[district_name]/[pages].db` (as SQLite format)
+
+## Install and run
+```bash
+# Consider using virtual environments
+pip install -e .
+scrape
+```
+
+## Develop
+```bash
+pip install -e .
+pip install -e ".[dev]"
+pip install -e ".[tests]"
+pytest
+```
