@@ -20,6 +20,7 @@ dev = [
 tests = [
     "pytest",
     "pytest-cov",
+    "coverage[toml]",
     "hypothesis",
 ]
 
@@ -36,6 +37,21 @@ include = ["scraper"]
 
 [tool.pytest.ini_options]
 addopts = [
-    "--import-mode=importlib",
+    "-v",
+    "--show-capture=stdout",
+    # "--capture=tee-sys",
+    # "--import-mode=importlib",
+    "--cov=scraper",
 ]
 pythonpath = "scraper"
+
+[tool.coverage.run]
+branch = true
+concurrency = [
+    "thread",
+    "multiprocessing",
+]
+cover_pylib = true
+
+[tool.coverage.report]
+show_missing = true
