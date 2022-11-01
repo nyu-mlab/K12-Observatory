@@ -65,7 +65,13 @@ def mock_site(http_server, server_ttl):
         # TODO: add stop mechanism for http_server.serve_forever()
         # NOTE: httpd.shutdown() will work after polling interval
         for i in range(server_ttl):
-            http_server.handle_request()
+            try:
+                http_server.handle_request()
+            except ValueError as err:
+                # Suppress error if caused by force closing the server from outside
+                # FIXME: might suppress other issues as well
+                if err.args[0] != "Invalid file descriptor: -1":
+                    raise err
 
     http_server.timeout = 1
     thread = threading.Thread(target=serve)
@@ -73,6 +79,7 @@ def mock_site(http_server, server_ttl):
 
     yield http_server, thread
 
+    http_server.server_close()
     thread.join(http_server.timeout + 1)
     assert not thread.is_alive()
 
