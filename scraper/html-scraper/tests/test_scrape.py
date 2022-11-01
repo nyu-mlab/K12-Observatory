@@ -1,15 +1,18 @@
 import http.server
 import errno
 import itertools
+import random
+import string
+import re
 import os
 import threading
 import pytest
 import requests
 
-# TODO: Test then setup http server
-
 
 def get_handler(self):
+    # TODO: give more responses, such as certain paths that trigger different responses and status codes, to test the scraper under different conditions (how to react when the status is 2/3/4/5XX)
+    # NOTE: if we are implementing various responses, we might as well replace the built-in http module with a serious server, maybe Flask or Tornado? want it to be as lightweight as possible though
     """GET method request handler"""
     self.send_response(200)
     self.send_header("Content-type", "text/plain")
@@ -92,8 +95,14 @@ class TestMockSite:
 
         from time import sleep
         for i in range(server_ttl):
-            requests.get(f"http://localhost:{port}/aa", timeout=(0.1, 0.1))
-            # TODO: inspect reply, grep for certain path or TTL for validation (should be enough)
+            resource_path = "".join(random.sample(string.ascii_letters, 4))
+            r = requests.get(f"http://localhost:{port}/{resource_path}",
+                             timeout=(0.1, 0.1))
+            assert r.ok
+            assert re.search(fr"\breq={resource_path}\b", r.text)
+            assert re.search(r"\bTTL=\d+\b", r.text)
+
+            # NOTE: keep validation scheme simple
 
 
 class TestScraping:
@@ -107,3 +116,6 @@ class TestScraping:
         pass
 
     # TODO: test scraping mock server for automated-whole-site scraping, then inspect site map
+    def test_scrape_site(self, mock_site):
+        # TODO: turn off TTL
+        pass
