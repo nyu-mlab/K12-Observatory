@@ -6,11 +6,16 @@ import scraper
 from scraper.perf import Timer
 
 
-def scrape():
+def get_targets():
+    """locate resources and find out a way to open them"""
     assert (data_dir := importlib.resources.files(scraper.targets)).is_dir()
     assert (nces_file := data_dir / "NCES.xlsx").is_file()
     assert (k12_file :=
             data_dir / "K12SIX-SchoolDistrictswIncidents.csv").is_file()
+    return (nces_file, k12_file)
+
+
+def scrape():
 
     fmt_str = lambda action_name: action_name + ":\n\t{:0.4f} seconds"
 
