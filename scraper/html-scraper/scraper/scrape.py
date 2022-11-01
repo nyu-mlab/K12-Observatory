@@ -5,14 +5,18 @@ import pandas as pd
 import scraper
 from scraper.perf import Timer
 
+valid_extensions = {
+    "csv",
+    "xlsx",
+}
+
 
 def get_targets():
-    """locate resources and find out a way to open them"""
+    """locate resources and find a way to open them"""
     assert (data_dir := importlib.resources.files(scraper.targets)).is_dir()
-    assert (nces_file := data_dir / "NCES.xlsx").is_file()
-    assert (k12_file :=
-            data_dir / "K12SIX-SchoolDistrictswIncidents.csv").is_file()
-    return (nces_file, k12_file)
+
+    return (file for file in data_dir.iterdir()
+            if file.is_file() and file.suffix.lstrip(".") in valid_extensions)
 
 
 def scrape():
