@@ -14,7 +14,7 @@ Outputs
 ```bash
 # Consider using virtual environments
 pip install -e .
-scrape
+python scraper/scrape.py
 ```
 
 ## Develop
@@ -23,4 +23,15 @@ pip install -e .
 pip install -e ".[dev]"
 pip install -e ".[tests]"
 pytest
+```
+
+## Concept
+```mermaid
+graph LR;
+    Queue-- URL --->Crawler;
+    Crawler-- page --->Processing;
+    Processing--->Persist[Store Results];
+    Processing-- URL -->Queue;
+    Processing-.->Renderer;
+    Renderer-.->Processing;
 ```
