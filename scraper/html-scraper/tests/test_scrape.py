@@ -60,21 +60,21 @@ def http_server(server_ttl):
 
 
 @pytest.fixture(scope="function")
-def mock_site(http_server, server_ttl):
+def mock_site(http_server):
     print("Serving on port:", http_server.server_address[1])
 
     def serve():
-        # TODO: serve indefinitely for sitemap exploring test cases, maybe count TTL in the handler?
         # TODO: add stop mechanism for http_server.serve_forever()
         # NOTE: httpd.shutdown() will work after polling interval
-        for i in range(server_ttl):
-            try:
-                http_server.handle_request()
-            except ValueError as err:
-                # Suppress error if caused by force closing the server from outside
-                # FIXME: might suppress other issues as well
-                if err.args[0] != "Invalid file descriptor: -1":
-                    raise err
+
+        # TODO: don't just suppress error, use 'pytest.raises' or 'pytest.warns' instead for such expected errors
+        try:
+            http_server.serve_forever()
+        except ValueError as err:
+            # Suppress error if caused by force closing the server from outside
+            # FIXME: might suppress other issues as well
+            if err.args[0] != "Invalid file descriptor: -1":
+                raise err
 
     http_server.timeout = 1
     thread = threading.Thread(target=serve)
@@ -82,6 +82,7 @@ def mock_site(http_server, server_ttl):
 
     yield http_server, thread
 
+    http_server.shutdown()
     http_server.server_close()
     thread.join(http_server.timeout + 1)
     assert not thread.is_alive()
