@@ -1,5 +1,6 @@
 import itertools
 import importlib.resources
+import pytest
 import pandas as pd
 import scraper
 
@@ -18,6 +19,7 @@ class TestTargetAcquisition:
             map(lambda x: hasattr(pd, x) and callable(getattr(pd, x)), (
                 "read_" + n for n in scraper.scrape.valid_extensions.values())))
 
+    @pytest.mark.skip(reason="takes too long + WIP")
     def test_find_all_targets(self, data_dir):
         # TODO: add test that generates fake files with valid and invalid extensions in a temp dir to further test target-finding
 
@@ -31,6 +33,7 @@ class TestTargetAcquisition:
 
         print([f.name for f in valid_files])
 
+    @pytest.mark.skip(reason="takes too long + WIP")
     def test_files_mapped_to_correct_open_func(self, data_dir):
         # TODO: this takes too long, consider building fake files in a temp dir or mark this test as slow to allow skipping
 
