@@ -66,14 +66,6 @@ def handler_factory(handler_dict: dict[str, Url]):
     return request_handler
 
 
-
-@pytest.fixture
-def server_ttl():
-    # FIXME: TTL's time means number of requests here
-    # TODO: refactor this after implementing the site map exploring test case
-    return 3
-
-
 @pytest.fixture
 def http_server():
     # TODO: let fixture inspect the requesting test context and decide whether to use TTL or not
@@ -135,20 +127,32 @@ def mock_site(request):
 
 class TestMockSite:
 
-    def test_server_reply(self, mock_site, server_ttl):
-        httpd, thread = mock_site
-        addr, port = httpd.server_address
+    def test_server_reply(self, mock_site):
+        """
+        main---page1 (O)
+        main---page2 (O)
+        main---page3 (O)
+        """
 
-        from time import sleep
-        for i in range(server_ttl):
-            resource_path = "".join(random.sample(string.ascii_letters, 4))
-            r = requests.get(f"http://localhost:{port}/{resource_path}",
-                             timeout=(0.1, 0.1))
+        main_site = mock_site(
+            "main",
+            {
+                "page1": (Url("main", "page2"),),
+                "page2": (Url("main", "page3"),),
+                "page3": (),
+            },
+        )
+
+        port = main_site.server_address[1]
+
+        for i in range(1, 4):
+            path = Url("main", f"page{i}")
+            print(path, repr(path), str(path))
+            r = requests.get(str(path), timeout=(0.1, 0.1))
+
             assert r.ok
-            assert re.search(fr"\breq={resource_path}\b", r.text)
-            assert re.search(r"\bTTL=\d+\b", r.text)
-
             # NOTE: keep validation scheme simple
+            assert re.search(fr"<title>page{i}</title>", r.text)
 
 
 class TestScraping:
@@ -162,6 +166,63 @@ class TestScraping:
         pass
 
     # TODO: test scraping mock server for automated-whole-site scraping, then inspect site map
-    def test_scrape_site(self, mock_site):
-        # TODO: turn off TTL
-        pass
+    def test_crawls_links(self, mock_site):
+        """
+        main---page1         (O)
+         |- main---page2     (O)
+         |   |- main---page4 (O)
+         |
+         |- main---page3     (O)
+             |- main---page5 (O)
+        """
+        main_site = mock_site(
+            "main",
+            {
+                "page1": (Url("main", "page2"), Url("main", "page3")),
+                "page2": (Url("main", "page4"),),
+                "page3": (Url("main", "page5"),),
+                "page4": (),
+                "page5": (),
+            },
+        )
+
+    def test_drops_second_level_third_party_links(self, mock_site):
+        """
+        main---page1                (O)
+         |- 3rd-party-1---page1     (O)
+         |   |- 3rd-party-1---page2 (X)
+         |   |- 3rd-party-2---page1 (X)
+         |
+         |- 3rd-party-3---page1     (O)
+             |- main---page2        (X)  TODO: should we crawl this?
+        """
+
+        main_site = mock_site(
+            "main",
+            {
+                "page1": (Url("third_party_1", "page1")),
+                "page2": (),
+            },
+        )
+        third_party_site1 = mock_site(
+            "third_party_1",
+            {
+                "page1": (
+                    Url("third_party_1", "page2"),
+                    Url("third_party_2", "page1"),
+                ),
+                "page2": (),
+            },
+        )
+        third_party_site2 = mock_site(
+            "third_party_2",
+            {
+                "page1": (),
+            },
+        )
+        third_party_site3 = mock_site(
+            "third_party_3",
+            {
+                "page1": (Url("main", "page2")),
+            },
+        )
