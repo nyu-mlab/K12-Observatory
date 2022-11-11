@@ -1,8 +1,11 @@
 import http.server
 import errno
 import itertools
-import random
-import string
+import weakref
+import socket
+import urllib.parse
+import pathlib
+import mimetypes
 import re
 import os
 import threading
@@ -14,25 +17,60 @@ try:
 except ModuleNotFoundError:
     from utils import mock
 
-def get_handler(self):
+
+class Url:
+    """Custom URL expression from HTTPServer and resource path"""
+    servers = weakref.WeakValueDictionary()
+
+    def __init__(self, server_name: str, path: str):
+        self.server_name = server_name
+        self.path = urllib.parse.quote(path)
+
+    def __str__(self):
+        """Runtime server lookup and URL generation"""
+        server = self.servers[self.server_name]
+        assert server.address_family in (socket.AF_INET, socket.AF_INET6)
+        return f"http://localhost:{server.server_address[1]}/{self.path}"
+
+
+def build_html(path: str, links: list[Url]) -> str:
+    return mock.template.render(
+        title=path,
+        links=(dict(href=str(link), caption=str(link)) for link in links),
+    )
+
+
+def handler_factory(handler_dict: dict[str, Url]):
     # TODO: give more responses, such as certain paths that trigger different responses and status codes, to test the scraper under different conditions (how to react when the status is 2/3/4/5XX)
     # NOTE: if we are implementing various responses, we might as well replace the built-in http module with a serious server, maybe Flask or Tornado? want it to be as lightweight as possible though
-    """GET method request handler"""
-    self.send_response(200)
-    self.send_header("Content-type", "text/plain")
-    self.end_headers()
-    self.wfile.write((f"req={self.path.lstrip('/')}\n"
-                      f"TTL={self.TTL}").encode())
-    # TODO: return normal html
-    # TODO:optional: do templating?
+    def request_handler(self):
+        path = self.path.lstrip("/")
+        print("got request:", path)
 
+        static_resource_dir = pathlib.Path(mock.__file__).parent / "static"
+        if (static_file := static_resource_dir / path).is_file():
+            self.send_response(200)
+            self.send_header("Content-type", mimetypes.guess_type(path))
+            self.end_headers()
+            self.wfile.write(static_file.read_bytes())
 
-def meta_request_handler(ttl):
+        elif path in handler_dict:
+            self.send_response(200)
+            self.send_header("Content-type", "text/html")
+            self.end_headers()
+            self.wfile.write((build_html(path, handler_dict[path])).encode())
+
+        else:
+            self.send_error(404)
+
+    return request_handler
+
+def meta_request_handler(pages):
     """Creates a request handler class that dies after TTL"""
     return type(
         "HTTPRequestHandler",
         (http.server.BaseHTTPRequestHandler,),
-        dict(TTL=ttl, do_GET=get_handler),
+        dict(do_GET=get_handler(pages)),
     )
 
 
