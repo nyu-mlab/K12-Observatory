@@ -9,6 +9,10 @@ import threading
 import pytest
 import requests
 
+try:
+    import mock
+except ModuleNotFoundError:
+    from utils import mock
 
 def get_handler(self):
     # TODO: give more responses, such as certain paths that trigger different responses and status codes, to test the scraper under different conditions (how to react when the status is 2/3/4/5XX)

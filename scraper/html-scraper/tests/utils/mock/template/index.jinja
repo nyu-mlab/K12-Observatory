@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>{{ title }}</title>
+        <meta name="viewport" content="width=device-width" />
+        <link rel="icon" sizes="16x16 32x32 48x48" type="image/svg+xml" href="/circle.svg" />
+        <meta name="description" content="Auxiliary stuff">
+        <meta property="og:title" content="nyc metro" />
+        <meta property="og:description" content="Omniiiiiiiiiii"/>
+        <meta property="og:image" content="http://localhost:9000/image/all.png" />
+        <meta property="og:image:alt" content="refrigerator, fan, microwave, vaccuum" />
+    </head>
+    <body>
+        <noscript>You'll see this if JavaScript is not enabled</noscript>
+        <img src="circle.png" alt="light switch" />
+        <header>
+            <h1>{{ title }}</h1>
+        </header>
+        <main>
+            <ul>
+                <li>n</li>
+                <li>y</li>
+                <li>u</li>
+                {% for link in links %}
+                    <li><a href="{{ link.href }}">{{ link.caption }}</a></li>
+                {% endfor %}
+            </ul>
+        </main>
+    </body>
+</html>

@@ -43,7 +43,10 @@ addopts = [
     # "--import-mode=importlib",
     "--cov=scraper",
 ]
-pythonpath = "scraper"
+pythonpath = [
+    "scraper",
+    "tests/utils",
+]
 
 [tool.coverage.run]
 branch = true
