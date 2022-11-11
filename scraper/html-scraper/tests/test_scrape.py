@@ -40,23 +40,31 @@ def server_ttl():
 
 
 @pytest.fixture
-def http_server(server_ttl):
+def http_server():
     # TODO: let fixture inspect the requesting test context and decide whether to use TTL or not
 
-    for port in itertools.chain(range(8000, 9000), "X"):
-        if port == "X":
-            raise OSError(errno.EADDRNOTAVAIL, os.strerror(errno.EADDRNOTAVAIL))
+    def _http_server(pages):
+        for port in itertools.chain(range(8000, 9000), "X"):
+            if port == "X":
+                raise OSError(errno.EADDRNOTAVAIL,
+                              os.strerror(errno.EADDRNOTAVAIL))
 
-        try:
-            with http.server.HTTPServer(
-                ("", port), meta_request_handler(server_ttl)) as httpd:
-                yield httpd
-            break
+            try:
+                # TODO: replace port trying and set this to port 0 instead to let the OS find a free port
+                # TODO: if we were to replace this entire for-range-try-port thing with port=0, we might as well simply the structure and merge this entire function into mock_site()
+                request_handler = type("HTTPRequestHandler",
+                                       (http.server.BaseHTTPRequestHandler,),
+                                       dict(do_GET=handler_factory(pages)))
+                # HACK: exploit the fact that HTTPServer's context manager does nothing, replace "yield" with "return"
+                return http.server.HTTPServer(("", port), request_handler)
+                break
 
-        except OSError as err:
-            if err.errno != errno.EADDRINUSE:
-                os.strerror(err.errno)
-                raise err
+            except OSError as err:
+                if err.errno != errno.EADDRINUSE:
+                    os.strerror(err.errno)
+                    raise err
+
+    return _http_server
 
 
 @pytest.fixture(scope="function")
