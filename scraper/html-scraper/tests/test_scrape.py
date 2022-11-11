@@ -65,13 +65,6 @@ def handler_factory(handler_dict: dict[str, Url]):
 
     return request_handler
 
-def meta_request_handler(pages):
-    """Creates a request handler class that dies after TTL"""
-    return type(
-        "HTTPRequestHandler",
-        (http.server.BaseHTTPRequestHandler,),
-        dict(do_GET=get_handler(pages)),
-    )
 
 
 @pytest.fixture
@@ -110,32 +103,34 @@ def http_server():
 
 
 @pytest.fixture(scope="function")
-def mock_site(http_server):
-    print("Serving on port:", http_server.server_address[1])
+def mock_site(request):
 
-    def serve():
-        # TODO: add stop mechanism for http_server.serve_forever()
-        # NOTE: httpd.shutdown() will work after polling interval
+    def _mock_site(name: str, pages: dict[str, Url]):
 
-        # TODO: don't just suppress error, use 'pytest.raises' or 'pytest.warns' instead for such expected errors
-        try:
-            http_server.serve_forever()
-        except ValueError as err:
-            # Suppress error if caused by force closing the server from outside
-            # FIXME: might suppress other issues as well
-            if err.args[0] != "Invalid file descriptor: -1":
-                raise err
+        request_handler = type("HTTPRequestHandler",
+                               (http.server.BaseHTTPRequestHandler,),
+                               dict(do_GET=handler_factory(pages)))
+        # NOTE: the context manager of HTTPServer is merely a "pass" statement, skip the "with" statement
+        server = http.server.ThreadingHTTPServer(("", 0), request_handler)
+        Url.servers[name] = server
+        print("Serving on port:", server.server_address[1])
 
-    http_server.timeout = 1
-    thread = threading.Thread(target=serve)
-    thread.start()
+        # NOTE: serve_forever() checks "poll_interval", handle_request() checks "timeout"
+        # NOTE: httpd.shutdown() will work after "polling_interval"
+        thread = threading.Thread(target=server.serve_forever)
+        thread.start()
 
-    yield http_server, thread
+        def stop_server():
+            assert thread.is_alive()
+            server.shutdown()
+            server.server_close()
+            thread.join(1)
+            assert not thread.is_alive()
 
-    http_server.shutdown()
-    http_server.server_close()
-    thread.join(http_server.timeout + 1)
-    assert not thread.is_alive()
+        request.addfinalizer(stop_server)
+        return server
+
+    return _mock_site
 
 
 class TestMockSite:
