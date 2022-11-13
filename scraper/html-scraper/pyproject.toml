@@ -22,6 +22,7 @@ tests = [
     "pytest-cov",
     "coverage[toml]",
     "hypothesis",
+    "jinja2",
 ]
 
 [project.scripts]
