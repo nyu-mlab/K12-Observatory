@@ -1,17 +1,19 @@
-import http.server
 import errno
+import http.server
 import itertools
-import weakref
-import socket
-import urllib.parse
-import pathlib
 import mimetypes
-import re
 import os
+import pathlib
+import re
+import socket
 import threading
+import urllib.parse
+import weakref
+
 import pytest
 import requests
 
+import scraper
 try:
     import mock
 except ModuleNotFoundError:
@@ -20,7 +22,9 @@ except ModuleNotFoundError:
 
 class Url:
     """Custom URL expression from HTTPServer and resource path"""
-    servers = weakref.WeakValueDictionary()
+    servers: weakref.WeakValueDictionary[
+        str, http.server.HTTPServer |
+        http.server.ThreadingHTTPServer] = weakref.WeakValueDictionary()
 
     def __init__(self, server_name: str, path: str):
         self.server_name = server_name
@@ -42,7 +46,7 @@ def build_html(path: str, links: list[Url]) -> str:
 
 def handler_factory(handler_dict: dict[str, Url]):
     # TODO: give more responses, such as certain paths that trigger different responses and status codes, to test the scraper under different conditions (how to react when the status is 2/3/4/5XX)
-    # NOTE: if we are implementing various responses, we might as well replace the built-in http module with a serious server, maybe Flask or Tornado? want it to be as lightweight as possible though
+    # TODO: if we are implementing various responses, we might as well replace the built-in http module with a serious server, maybe Flask or Tornado? want it to be as lightweight as possible though
     def request_handler(self):
         path = self.path.lstrip("/")
         print("got request:", path)
@@ -68,7 +72,6 @@ def handler_factory(handler_dict: dict[str, Url]):
 
 @pytest.fixture
 def http_server():
-    # TODO: let fixture inspect the requesting test context and decide whether to use TTL or not
 
     def _http_server(pages):
         for port in itertools.chain(range(8000, 9000), "X"):
@@ -103,12 +106,10 @@ def mock_site(request):
                                (http.server.BaseHTTPRequestHandler,),
                                dict(do_GET=handler_factory(pages)))
         # NOTE: the context manager of HTTPServer is merely a "pass" statement, skip the "with" statement
-        server = http.server.ThreadingHTTPServer(("", 0), request_handler)
+        server = http.server.HTTPServer(("", 0), request_handler)
         Url.servers[name] = server
         print("Serving on port:", server.server_address[1])
 
-        # NOTE: serve_forever() checks "poll_interval", handle_request() checks "timeout"
-        # NOTE: httpd.shutdown() will work after "polling_interval"
         thread = threading.Thread(target=server.serve_forever)
         thread.start()
 
@@ -116,7 +117,7 @@ def mock_site(request):
             assert thread.is_alive()
             server.shutdown()
             server.server_close()
-            thread.join(1)
+            thread.join(1)  # NOTE: serve_forever() polling_interval is 0.5 sec
             assert not thread.is_alive()
 
         request.addfinalizer(stop_server)
@@ -155,15 +156,17 @@ class TestMockSite:
             assert re.search(fr"<title>page{i}</title>", r.text)
 
 
-class TestScraping:
-    pass
-
-    # TODO: do test case setup: run_server()
+class TestDownloader:
 
     # TODO: test scraping mock server for single page, then halt and inspect
+    @pytest.mark.skip(reason="WIP")
     def test_scrape_single_page(self, mock_site):
-        # TODO: set TTL = 1
         pass
+
+    # TODO: test result persistence
+
+
+class TestCrawler:
 
     # TODO: test scraping mock server for automated-whole-site scraping, then inspect site map
     def test_crawls_links(self, mock_site):
@@ -226,3 +229,9 @@ class TestScraping:
                 "page1": (Url("main", "page2")),
             },
         )
+
+
+class TestScheduler:
+    pass
+    # TODO: scheduler behavior
+    # TODO: queue persistence
