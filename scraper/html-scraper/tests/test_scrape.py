@@ -1,8 +1,5 @@
-import errno
 import http.server
-import itertools
 import mimetypes
-import os
 import pathlib
 import re
 import socket
@@ -70,33 +67,6 @@ def handler_factory(handler_dict: dict[str, Url]):
     return request_handler
 
 
-@pytest.fixture
-def http_server():
-
-    def _http_server(pages):
-        for port in itertools.chain(range(8000, 9000), "X"):
-            if port == "X":
-                raise OSError(errno.EADDRNOTAVAIL,
-                              os.strerror(errno.EADDRNOTAVAIL))
-
-            try:
-                # TODO: replace port trying and set this to port 0 instead to let the OS find a free port
-                # TODO: if we were to replace this entire for-range-try-port thing with port=0, we might as well simply the structure and merge this entire function into mock_site()
-                request_handler = type("HTTPRequestHandler",
-                                       (http.server.BaseHTTPRequestHandler,),
-                                       dict(do_GET=handler_factory(pages)))
-                # HACK: exploit the fact that HTTPServer's context manager does nothing, replace "yield" with "return"
-                return http.server.HTTPServer(("", port), request_handler)
-                break
-
-            except OSError as err:
-                if err.errno != errno.EADDRINUSE:
-                    os.strerror(err.errno)
-                    raise err
-
-    return _http_server
-
-
 @pytest.fixture(scope="function")
 def mock_site(request):
 
@@ -143,8 +113,6 @@ class TestMockSite:
                 "page3": (),
             },
         )
-
-        port = main_site.server_address[1]
 
         for i in range(1, 4):
             path = Url("main", f"page{i}")
