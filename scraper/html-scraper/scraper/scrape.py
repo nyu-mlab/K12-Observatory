@@ -1,5 +1,6 @@
 """ Main scraper code
 """
+import itertools
 import importlib.resources
 import pandas as pd
 import scraper
@@ -10,6 +11,15 @@ valid_extensions = {
     "csv": "csv",
     "xlsx": "excel",
 }
+
+
+class StartURLs:
+
+    def __init__(self, *argv):
+        self.urls = set(itertools.chain(*argv))
+
+    def __iter__(self):
+        return iter(self.urls)
 
 
 def get_targets():
