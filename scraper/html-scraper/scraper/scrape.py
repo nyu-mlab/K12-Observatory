@@ -6,12 +6,6 @@ import pandas as pd
 import scraper
 from scraper.perf import Timer
 
-valid_extensions = {
-    # maps extension to pandas opening function name suffix
-    "csv": "csv",
-    "xlsx": "excel",
-}
-
 
 class StartURLs:
 
@@ -21,18 +15,8 @@ class StartURLs:
     def __iter__(self):
         return iter(self.urls)
 
-
-def get_targets():
-    """locate resources and find a way to open them"""
-
-    assert (data_dir := importlib.resources.files(scraper.targets)).is_dir()
-
-    file_method_mapping = {
-        file: getattr(pd, "read_" + valid_extensions[file.suffix.lstrip(".")])
-        for file in data_dir.iterdir()
-        if file.is_file() and file.suffix.lstrip(".") in valid_extensions
-    }
-    return file_method_mapping
+    def __repr__(self) -> str:
+        return repr(self.urls)
 
 
 def scrape():
