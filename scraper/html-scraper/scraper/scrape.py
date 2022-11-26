@@ -2,7 +2,6 @@
 """
 import itertools
 import importlib.resources
-import pandas as pd
 import scraper
 from scraper.perf import Timer
 
@@ -21,6 +20,15 @@ class StartURLs:
 
 def scrape():
 
+    StartURLs(
+        scraper.target.extract(
+            data_dir=importlib.resources.files(scraper.targets),
+            usecols=["Website"],
+            dtype={"Website": "string"},
+        ))
+    exit()
+
+    # TODO: move these to performance profiling code
     fmt_str = lambda action_name: action_name + ":\n\t{:0.4f} seconds"
 
     with Timer(fmt_str("Read nces")):
