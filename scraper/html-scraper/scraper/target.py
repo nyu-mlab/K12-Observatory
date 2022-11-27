@@ -1,5 +1,5 @@
-"""Target acquisition"""
-
+"""Target acquisition
+"""
 import pandas as pd
 
 
@@ -26,11 +26,22 @@ class TargetAcquisitionHelper:
         return file_method_mapping
 
     def __call__(self, *, data_dir, **kwargs):
-        """actually opening resources"""
+        """actually opening resources
+
+            carries Pandas file reading arguments:
+            - usecols : list[str] (mandatory)
+            - dtype : dict[str, str] (optional)
+        """
+        usecols = kwargs["usecols"]
+        assert len(usecols) == 1
+        if dtype := kwargs.get("dtype"):
+            assert set(dtype.keys()) == set(usecols)
+
         extracted = [
             method(file, **kwargs)
             for file, method in self.find(data_dir).items()
         ]
+
         return extracted
 
 
