@@ -10,6 +10,19 @@ import scraper
 class StartURLs:
 
     def __init__(self, *argv):
+        """argv is a list of list of URLs,
+        e.g.
+        StartURLs(
+            [
+                "aaa",
+                "bbb",
+            ],
+            [
+                "ccc",
+                "ddd",
+            ],
+        )
+        """
         self.urls = set(itertools.chain(*argv))
 
     def __iter__(self):
