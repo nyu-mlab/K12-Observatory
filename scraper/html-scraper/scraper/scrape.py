@@ -1,9 +1,10 @@
 """ Main scraper code
 """
-import itertools
 import importlib.resources
-import scraper
+import itertools
+import random
 from scraper.perf import Timer
+import scraper
 
 
 class StartURLs:

@@ -1,9 +1,8 @@
-import itertools
 import importlib.resources
-import pytest
+import itertools
 import pandas as pd
+import pytest
 import scraper
-import scraper.target
 
 
 @pytest.fixture
