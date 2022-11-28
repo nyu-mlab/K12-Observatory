@@ -87,3 +87,15 @@ class TestStartUrlAssembly:
         assert isinstance(start_urls, set)
         assert len(start_urls) > 0
         assert isinstance(list(start_urls)[0], str)
+
+    @pytest.mark.parametrize("seed", [None, 0])
+    def test_shuffle(self, random_str_group, seed):
+        # TODO: replace with 'hypothisis'
+        fixture_ans = set(itertools.chain.from_iterable(random_str_group))
+        random_result = scraper.scrape.StartURLs(*random_str_group,
+                                                 shuffle=True,
+                                                 random_seed=seed).urls
+
+        random_result_set = set(random_result)
+        assert len(random_result_set) == len(random_result)
+        assert random_result_set == fixture_ans

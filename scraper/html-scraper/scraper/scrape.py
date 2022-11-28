@@ -9,7 +9,7 @@ import scraper
 
 class StartURLs:
 
-    def __init__(self, *argv):
+    def __init__(self, *argv, shuffle=False, random_seed=None):
         """argv is a list of list of URLs,
         e.g.
         StartURLs(
@@ -24,6 +24,11 @@ class StartURLs:
         )
         """
         self.urls = set(itertools.chain(*argv))
+
+        if shuffle:
+            random.seed(random_seed)
+            self.urls = list(self.urls)
+            random.shuffle(self.urls)
 
     def __iter__(self):
         return iter(self.urls)
