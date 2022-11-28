@@ -38,10 +38,9 @@ class TargetAcquisitionHelper:
         if dtype := kwargs.get("dtype"):
             assert set(dtype.keys()) == set(usecols)
 
-        extracted = [
-            method(file, **kwargs)
-            for file, method in self.find(data_dir).items()
-        ]
+        extracted = itertools.chain.from_iterable(
+            method(file, **kwargs).squeeze("columns").to_list()
+            for file, method in self.find(data_dir).items())
 
         return extracted
 
