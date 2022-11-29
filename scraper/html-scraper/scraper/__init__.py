@@ -1,1 +1,4 @@
-from . import scrape, perf, target, targets
+from . import crawler, downloader, perf, scrape, target, targets
+
+Crawler = crawler.Crawler
+Downloader = downloader.Downloader
