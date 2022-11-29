@@ -6,10 +6,8 @@ import socket
 import threading
 import urllib.parse
 import weakref
-
 import pytest
 import requests
-
 import scraper
 try:
     import mock
