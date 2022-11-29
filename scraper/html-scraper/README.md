@@ -12,14 +12,17 @@ Outputs
 
 ## Concept
 ```mermaid
-graph LR;
-    Queue-- URL --->Downloader;
-    Queue --> PersistQueue[Persistent Storage];
-    Downloader-- "page --> middleware" --->Crawler;
-    Crawler--->PersistResults[Result Store];
-    Crawler-- "middleware <-- URL" -->Queue;
-    Crawler-.->Renderer;
-    Renderer-.->Crawler;
+flowchart LR
+    subgraph Queue
+        Scheduler
+    end
+    Queue --URL---> Downloader
+    Queue --> PersistQueue[Persistent Storage]
+    Downloader --"page --> middleware"---> Crawler
+    Crawler ---> PersistResults[Result Store]
+    Crawler --"middleware <-- URL"--> Queue
+    Crawler -.-> Renderer
+    Renderer -.-> Crawler
 ```
 
 ## Install and run
