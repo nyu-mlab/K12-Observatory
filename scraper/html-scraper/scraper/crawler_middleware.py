@@ -18,7 +18,8 @@ class Depth(Middleware):
 
     def process(self, task):
         if not (current_depth := task.metadata.get("depth")):
-            task.metadata["depth"] = 0
+            current_depth = 0
+            task.metadata["depth"] = current_depth
 
         for spawned_task in task.results:  # discovered URLs
             spawned_task.metadata["depth"] = current_depth + 1
