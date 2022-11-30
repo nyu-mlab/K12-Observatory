@@ -2,6 +2,8 @@
 post-crawler processing plugins
 """
 import abc
+import functools
+import urllib.parse
 import scraper.task
 
 
@@ -34,10 +36,16 @@ class ThirdParty(Middleware):
     # FIXME: what if the root request itself is redirected right from the start? shall we update upon root-request redirection or use task.response.url for root_domain instead?
 
     @staticmethod
-    def get_hostname(url):
+    @functools.lru_cache
+    def get_registered_domain(url):
         # FIXME: import tldextract
+        # TODO: can we replace "tldextract"?
         return tldextract.extract(url).registered_domain
 
+    @staticmethod
+    def get_hostname(url):
+        hostname = urllib.parse.urlparse(url).hostname
+        return ThirdParty.get_registered_domain(hostname)
 
     def process(self, task):
         """don't visit any links from third party pages"""
