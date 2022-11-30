@@ -53,10 +53,14 @@ class ThirdParty(Middleware):
 
         if root_hostname := task.metadata.get("root_hostname"):
             is_3rd_party = root_hostname == self.get_hostname(task.response.url)
-            if is_3rd_party:
-                task.results.clear()
         else:
-            task.metadata["root_hostname"] = self.get_hostname(task.request.url)
+            root_hostname = self.get_hostname(task.request.url)
+            task.metadata["root_hostname"] = root_hostname
+            is_3rd_party = False
+
+        if is_3rd_party:
+            task.results.clear()
+        else:
             for spawned_task in task.results:
                 spawned_task.metadata["root_hostname"] = root_hostname
 
