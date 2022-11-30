@@ -22,6 +22,12 @@ class Depth(Middleware):
             spawned_task.metadata["depth"] = current_depth + 1
 
 
+class Referer(Middleware):
+
+    def process(self, task):
+        pass
+
+
 class Offsite(Middleware):
     """Filter out second level third party site requests"""
     pass

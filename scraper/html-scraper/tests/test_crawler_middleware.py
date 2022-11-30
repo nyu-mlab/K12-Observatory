@@ -21,6 +21,11 @@ class TestDepthMiddleware:
     _ = middleware.Depth
 
 
+class TestRefererMiddleware:
+    # TODO:
+    _ = middleware.Referer
+
+
 class TestOffsiteMiddleware:
     # TODO:
     _ = middleware.Offsite

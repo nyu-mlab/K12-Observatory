@@ -7,7 +7,7 @@ middleware = [
     middleware.BinaryContent,
     middleware.Depth,
     middleware.Offsite,
-    #middleware.Referer,  # XXX: do we need this?
+    middleware.Referer,
 ]
 
 
