@@ -1,12 +1,13 @@
-""" finding out what pages exist on the web, aka "URL discovery"
-visit (or "crawl") the page to find out what's on it
+""" visit (or "crawl") the page to find out what's on it
 """
+import scraper.downloader_middleware as middleware
 
 middleware = [
-    DepthMiddleware,
-    HttpErrorMiddleware,  # Filter out unsuccessful (erroneous) HTTP responses
-    OffsiteMiddleware,  # Filter out second level third party site requests
-    BinaryContentMiddleware,  # Filter out requests with binary extensions before sending request
+    middleware.BinaryContent,
+    middleware.HttpError,
+    #middleware.HttpProxy,  # XXX: do we need this?
+    middleware.JsCrawl,
+    #middleware.UserAgent,  # XXX: do we need this?
 ]
 
 

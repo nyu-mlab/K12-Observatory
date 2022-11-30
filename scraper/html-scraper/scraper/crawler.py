@@ -1,14 +1,13 @@
 """ tries to understand what the page is about
-this includes processing and analyzing the textual content and key content tags and attributes
+including process and analyze textual content + key content tags and attributes
 """
-
+import scraper.crawler_middleware as middleware
 
 middleware = [
-    #CookiesMiddleware,
-    HttpProxyMiddleware,
-    UserAgentMiddleware,
-    JsCrawlMiddleware,  # https://developers.google.com/search/docs/ajax-crawling/docs/getting-started
-    BinaryContentMiddleware,  # Filter out binary content via "Content-Type" header before parsing
+    middleware.BinaryContent,
+    middleware.Depth,
+    middleware.Offsite,
+    #middleware.Referer,  # XXX: do we need this?
 ]
 
 
