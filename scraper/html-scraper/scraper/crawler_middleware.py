@@ -13,7 +13,13 @@ class Middleware(abc.ABC):
 
 
 class Depth(Middleware):
-    pass
+
+    def process(self, task):
+        if not (current_depth := task.metadata.get("depth")):
+            task.metadata["depth"] = 0
+
+        for spawned_task in task.results:  # discovered URLs
+            spawned_task.metadata["depth"] = current_depth + 1
 
 
 class Offsite(Middleware):
