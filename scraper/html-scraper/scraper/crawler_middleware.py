@@ -28,7 +28,7 @@ class Referer(Middleware):
         pass
 
 
-class Offsite(Middleware):
+class ThirdParty(Middleware):
     """Filter out second level third party site requests"""
     pass
 

@@ -6,7 +6,7 @@ import scraper.crawler_middleware as middleware
 middleware = [
     middleware.BinaryContent,
     middleware.Depth,
-    middleware.Offsite,
+    middleware.ThirdParty,
     middleware.Referer,
 ]
 

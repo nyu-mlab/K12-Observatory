@@ -26,6 +26,6 @@ class TestRefererMiddleware:
     _ = middleware.Referer
 
 
-class TestOffsiteMiddleware:
+class TestThirdPartyMiddleware:
     # TODO:
-    _ = middleware.Offsite
+    _ = middleware.ThirdParty
