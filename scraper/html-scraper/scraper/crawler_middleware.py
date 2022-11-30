@@ -30,7 +30,27 @@ class Referer(Middleware):
 
 class ThirdParty(Middleware):
     """Filter out second level third party site requests"""
-    pass
+
+    # FIXME: what if the root request itself is redirected right from the start? shall we update upon root-request redirection or use task.response.url for root_domain instead?
+
+    @staticmethod
+    def get_hostname(url):
+        # FIXME: import tldextract
+        return tldextract.extract(url).registered_domain
+
+
+    def process(self, task):
+        """don't visit any links from third party pages"""
+        # TODO: should we do "drop third party links from third party pages" instead?
+
+        if root_hostname := task.metadata.get("root_hostname"):
+            is_3rd_party = root_hostname == self.get_hostname(task.response.url)
+            if is_3rd_party:
+                task.results.clear()
+        else:
+            task.metadata["root_hostname"] = self.get_hostname(task.request.url)
+            for spawned_task in task.results:
+                spawned_task.metadata["root_hostname"] = root_hostname
 
 
 class BinaryContent(Middleware):
