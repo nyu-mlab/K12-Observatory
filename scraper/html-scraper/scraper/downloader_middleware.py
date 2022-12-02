@@ -16,7 +16,10 @@ class Middleware(abc.ABC):
 
 class HttpError(Middleware):
     """Filter out unsuccessful (erroneous) HTTP responses"""
-    pass
+
+    def process(self, task):
+        if not task.response.ok:
+            task.metadata["drop"] = True  # Drop this request
 
 
 class JsCrawl(Middleware):
