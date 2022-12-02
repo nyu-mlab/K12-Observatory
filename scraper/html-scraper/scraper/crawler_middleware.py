@@ -52,13 +52,11 @@ class ThirdParty(Middleware):
         """don't visit any links from third party pages"""
         # TODO: should we do "drop third party links from third party pages" instead?
 
-        if root_hostname := task.metadata.get("root_hostname"):
-            is_3rd_party = root_hostname != self.get_hostname(task.response.url)
-        else:
+        if not (root_hostname := task.metadata.get("root_hostname")):
             root_hostname = self.get_hostname(task.request.url)
             task.metadata["root_hostname"] = root_hostname
-            is_3rd_party = False
 
+        is_3rd_party = root_hostname != self.get_hostname(task.response.url)
         if is_3rd_party:
             task.results.clear()
         else:
