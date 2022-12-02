@@ -5,6 +5,7 @@ import abc
 import functools
 import urllib.parse
 import scraper.task
+import tldextract
 
 
 class Middleware(abc.ABC):
@@ -44,7 +45,6 @@ class ThirdParty(Middleware):
     @staticmethod
     @functools.lru_cache
     def get_registered_domain(url):
-        # FIXME: import tldextract
         # TODO: can we replace "tldextract"?
         return tldextract.extract(url).registered_domain
 

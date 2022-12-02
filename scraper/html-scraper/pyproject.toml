@@ -9,6 +9,7 @@ dependencies = [
     "pandas",
     "openpyxl",
     "requests",
+    "tldextract",
 ]
 dynamic = ["version"]
 
