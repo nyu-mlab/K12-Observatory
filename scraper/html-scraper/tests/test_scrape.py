@@ -78,14 +78,16 @@ def mock_site(request):
         Url.servers[name] = server
         print("Serving on port:", server.server_address[1])
 
-        thread = threading.Thread(target=server.serve_forever)
+        thread = threading.Thread(target=server.serve_forever,
+                                  kwargs=dict(poll_interval=0.1))
         thread.start()
 
         def stop_server():
             assert thread.is_alive()
             server.shutdown()
             server.server_close()
-            thread.join(1)  # NOTE: serve_forever() polling_interval is 0.5 sec
+            # NOTE: serve_forever() default "poll_interval" is 0.5 sec
+            thread.join(0.2)
             assert not thread.is_alive()
 
         request.addfinalizer(stop_server)
