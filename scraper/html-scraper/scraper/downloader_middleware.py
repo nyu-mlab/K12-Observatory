@@ -25,7 +25,8 @@ class HttpError(Middleware):
 class JsCrawl(Middleware):
     # TODO: TEMP:
     # NOTE: REF: https://developers.google.com/search/docs/ajax-crawling/docs/getting-started
-    pass
+    def process(self, task):
+        pass
 
 
 class BinaryContent(Middleware):
