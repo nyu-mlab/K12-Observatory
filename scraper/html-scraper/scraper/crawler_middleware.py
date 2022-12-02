@@ -28,7 +28,12 @@ class Depth(Middleware):
 class Referer(Middleware):
 
     def process(self, task):
-        pass
+        if not (referer := task.metadata.get("referer")):
+            referer = ""
+            task.metadata["referer"] = referer
+
+        for spawned_task in task.results:
+            spawned_task.metadata["referer"] = task.request.url
 
 
 class ThirdParty(Middleware):
