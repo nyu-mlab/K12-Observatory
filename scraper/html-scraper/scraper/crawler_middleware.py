@@ -70,5 +70,13 @@ class ThirdParty(Middleware):
 
 
 class BinaryContent(Middleware):
-    """Filter out requests with binary extensions before sending request"""
-    pass
+    """Filter out requests with binary extensions before building request"""
+
+    BINARY_CONTENT_TYPES = ["pdf", "zip", "audio", "image", "video"]
+
+    def process(self, task):
+        if task.response.headers['Content-Type'] in self.BINARY_CONTENT_TYPES:
+            task.metadata["drop"] = True  # Drop this request
+
+
+# TODO: enqueue-drop-decorator wraps and checks for metadata["drop"] then acts accordingly
