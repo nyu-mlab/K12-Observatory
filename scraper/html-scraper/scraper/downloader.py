@@ -1,6 +1,7 @@
 """ visit (or "crawl") the page to find out what's on it
 """
 import scraper.downloader_middleware as middleware
+import scraper.task
 
 middleware = [
     middleware.BinaryContent,
@@ -14,4 +15,10 @@ middleware = [
 class Downloader:
 
     def __init__(self, n_worker=1):
+        pass
+
+    def process(self, task: scraper.task.Task):
+        if task.metadata.get("drop"):
+            return None
+
         pass
