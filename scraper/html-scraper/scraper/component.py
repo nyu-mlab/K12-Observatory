@@ -23,7 +23,7 @@ class Component(abc.ABC):
         elif isinstance(middleware, (list, tuple)):
             # preserve original order
             mw_graph = graphlib.TopologicalSorter()
-            if len(middleware < 2):
+            if len(middleware) < 2:
                 mw_graph.add(middleware[0])
             else:
                 for predecessor, node in itertools.pairwise(middleware):
