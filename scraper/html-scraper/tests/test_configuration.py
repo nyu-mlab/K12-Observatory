@@ -49,6 +49,11 @@ class TestTargetAcquisition:
         scraper.target.extract(
             data_dir=data_dir,
             usecols=["Website"],
+            nrows=5,
+        )
+        scraper.target.extract(
+            data_dir=data_dir,
+            usecols=["Website"],
             dtype={"Website": "string"},
             nrows=5,
         )
