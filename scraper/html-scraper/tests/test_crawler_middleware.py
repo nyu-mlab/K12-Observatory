@@ -1,3 +1,5 @@
+import mimetypes
+
 import pytest
 import requests
 import scraper.crawler_middleware as middleware
@@ -34,8 +36,24 @@ class TestMiddlewareBaseClass:
 
 
 class TestBinaryContentMiddleware:
-    # TODO:
-    _ = middleware.BinaryContent
+
+    def test_process(self, basic_task):
+        for mime_type in (mimetypes.types_map |
+                          mimetypes.common_types).values():
+            task = basic_task()
+            task.response.headers["Content-Type"] = mime_type
+            middleware.BinaryContent.process(task)
+
+            if any(bin_type in mime_type for bin_type in
+                   middleware.BinaryContent.BINARY_CONTENT_TYPES):
+                assert task.metadata["drop"] is True
+            else:
+                # some False value or the "drop" key doesn't even exist
+                if hasattr(task.metadata, "drop"):
+                    assert bool(task.metadata["drop"]) is not False
+                else:
+                    with pytest.raises(KeyError):
+                        print(task.metadata["drop"])
 
 
 class TestDepthMiddleware:
@@ -144,5 +162,8 @@ class TestRefererMiddleware:
 
 
 class TestThirdPartyMiddleware:
-    # TODO:
-    _ = middleware.ThirdParty
+
+    @pytest.mark.skip("WIP")
+    def test_process(self, basic_task):
+        task = basic_task()
+        processed_task = middleware.ThirdParty.process(task)
