@@ -5,6 +5,7 @@ import requests
 
 class Task:
     """Basic unit of encapsulation and serialization/deserialization"""
+
     # TODO: make "Task" objects safe for parallelization
 
     def __init__(
@@ -14,6 +15,8 @@ class Task:
         timeout=60,
         priority=1,
     ):
+        if not isinstance(request, requests.Request):
+            raise ValueError(f"type of argument <request> is: {type(request)}")
         self.request = request
         self.timeout = timeout
         self.priority = priority  # additional priority for scheduler to use (e.g. can be used to crawl shallow pages first or deep pages first)
@@ -27,3 +30,6 @@ class Task:
         self.metadata = {}
 
     # TODO: sort all property methods
+    @property
+    def downloaded(self):
+        return not self.response is None
