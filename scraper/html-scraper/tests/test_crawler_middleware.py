@@ -40,6 +40,7 @@ class TestDepthMiddleware:
     def test_process_non_root_requests(self, basic_task):
         """Preserve non-root request depth"""
 
+        # TODO: should we validate depth to be a Natural Number?
         non_root_task = basic_task()
         non_root_task.metadata["depth"] = 1
         depth = non_root_task.metadata["depth"]
@@ -57,7 +58,7 @@ class TestDepthMiddleware:
             print(root_task.metadata["depth"])
 
         root_task.results = list((scraper.task.Task(
-            requests.Request(url="http://localhost/resource")),)) * 4
+            requests.Request(url="http://localhost/resource2")),)) * 4
 
         middleware.Depth.process(root_task)
         assert all(
@@ -69,7 +70,7 @@ class TestDepthMiddleware:
         depth = non_root_task.metadata["depth"]
 
         non_root_task.results = list((scraper.task.Task(
-            requests.Request(url="http://localhost/resource")),)) * 4
+            requests.Request(url="http://localhost/resource2")),)) * 4
 
         middleware.Depth.process(non_root_task)
         assert all(subtask.metadata["depth"] == depth + 1
@@ -77,8 +78,56 @@ class TestDepthMiddleware:
 
 
 class TestRefererMiddleware:
-    # TODO:
-    _ = middleware.Referer
+
+    def test_process_root_requests(self, basic_task):
+        """Init root request referer to empty string"""
+
+        root_task = basic_task()
+        with pytest.raises(KeyError):
+            print(root_task.metadata["referer"])
+
+        middleware.Referer.process(root_task)
+        assert root_task.metadata["referer"] == ""
+
+    def test_process_non_root_requests(self, basic_task):
+        """Preserve non-root request referer"""
+
+        # TODO: should we validate referer to be a valid URL?
+        non_root_task = basic_task()
+        non_root_task.metadata["referer"] = "http://jabba.the.hut/resource"
+        referer = non_root_task.metadata["referer"]
+
+        middleware.Referer.process(non_root_task)
+        assert non_root_task.metadata["referer"] == referer
+
+    def test_increase_children_depth(self, basic_task):
+        # root/non-root requests could have different code paths,
+        # should be tested separately
+
+        # root request
+        root_task = basic_task()
+        with pytest.raises(KeyError):
+            print(root_task.metadata["referer"])
+        root_url = root_task.request.url
+
+        root_task.results = list((scraper.task.Task(
+            requests.Request(url="http://localhost/resource2")),)) * 4
+
+        middleware.Referer.process(root_task)
+        assert all(subtask.metadata["referer"] == root_url
+                   for subtask in root_task.results)
+
+        # non root request
+        non_root_task = basic_task()
+        non_root_task.metadata["referer"] = "http://jabba.the.hut/resource"
+        request_url = non_root_task.request.url
+
+        non_root_task.results = list((scraper.task.Task(
+            requests.Request(url="http://localhost/resource2")),)) * 4
+
+        middleware.Referer.process(non_root_task)
+        assert all(subtask.metadata["referer"] == request_url
+                   for subtask in non_root_task.results)
 
 
 class TestThirdPartyMiddleware:
