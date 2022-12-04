@@ -42,7 +42,7 @@ addopts = [
     "-v",
     "--show-capture=stdout",
     # "--capture=tee-sys",
-    # "--import-mode=importlib",
+    "--import-mode=importlib",
     "--cov=scraper",
 ]
 pythonpath = [
