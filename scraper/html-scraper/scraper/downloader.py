@@ -13,6 +13,7 @@ default_middleware = (
 
 
 class Downloader:
+    """Downloader"""
 
     def __init__(self, n_worker=1, middleware=default_middleware):
         pass

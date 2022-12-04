@@ -14,6 +14,7 @@ default_middleware = (
 
 
 class Crawler:
+    """Crawler"""
 
     def __init__(self, n_worker=1, middleware=default_middleware):
         pass

@@ -9,6 +9,8 @@ import scraper
 
 
 class StartURLs:
+    """Lists of URLs to start from.
+    """
 
     def __init__(self, *argv, shuffle=False, random_seed=None):
         """argv is a list of list of URLs,

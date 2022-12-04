@@ -1,3 +1,7 @@
+""" scraper.
+
+scrapes the internet
+"""
 from . import (crawler, crawler_middleware, downloader, downloader_middleware,
                perf, scrape, target, targets, task)
 

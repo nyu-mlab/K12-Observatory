@@ -4,6 +4,7 @@ import requests
 
 
 class Task:
+    """Basic unit of encapsulation and serialization/deserialization"""
 
     def __init__(
         self,
