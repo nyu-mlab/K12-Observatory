@@ -10,15 +10,20 @@ import scraper.task
 
 class Middleware(abc.ABC):
 
+    @classmethod
     @abc.abstractmethod
-    def process(self, task: scraper.task.Task):
+    def process(cls, task: scraper.task.Task):
         pass
+
+
+# TODO: crawler-drop-decorator wraps and checks for metadata["drop"] then acts accordingly
 
 
 class HttpError(Middleware):
     """Filter out unsuccessful (erroneous) HTTP responses"""
 
-    def process(self, task):
+    @classmethod
+    def process(cls, task):
         if not task.response.ok:
             task.metadata["drop"] = True  # Drop this request
 
@@ -26,7 +31,9 @@ class HttpError(Middleware):
 class JsCrawl(Middleware):
     # TODO: TEMP:
     # NOTE: REF: https://developers.google.com/search/docs/ajax-crawling/docs/getting-started
-    def process(self, task):
+
+    @classmethod
+    def process(cls, task):
         pass
 
 
@@ -38,11 +45,9 @@ class BinaryContent(Middleware):
         "mov", "flv"
     ]
 
-    def process(self, task):
+    @classmethod
+    def process(cls, task):
         resource_path = urllib.parse.urlparse(task.response.url).path
         if pathlib.PurePath(
-                resource_path).suffix in self.BINARY_CONTENT_EXTENSIONS:
+                resource_path).suffix in cls.BINARY_CONTENT_EXTENSIONS:
             task.metadata["drop"] = True  # Drop this request
-
-
-# TODO: crawler-drop-decorator wraps and checks for metadata["drop"] then acts accordingly

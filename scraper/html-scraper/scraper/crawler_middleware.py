@@ -11,14 +11,19 @@ import tldextract
 
 class Middleware(abc.ABC):
 
+    @classmethod
     @abc.abstractmethod
-    def process(self, task: scraper.task.Task):
+    def process(cls, task: scraper.task.Task):
         pass
+
+
+# TODO: enqueue-drop-decorator wraps and checks for metadata["drop"] then acts accordingly
 
 
 class Depth(Middleware):
 
-    def process(self, task):
+    @classmethod
+    def process(cls, task):
         if not (current_depth := task.metadata.get("depth")):
             current_depth = 0
             task.metadata["depth"] = current_depth
@@ -29,7 +34,8 @@ class Depth(Middleware):
 
 class Referer(Middleware):
 
-    def process(self, task):
+    @classmethod
+    def process(cls, task):
         if not (referer := task.metadata.get("referer")):
             referer = ""
             task.metadata["referer"] = referer
@@ -54,15 +60,16 @@ class ThirdParty(Middleware):
         hostname = urllib.parse.urlparse(url).hostname
         return ThirdParty.get_registered_domain(hostname)
 
-    def process(self, task):
+    @classmethod
+    def process(cls, task):
         """don't visit any links from third party pages"""
         # TODO: should we do "drop third party links from third party pages" instead?
 
         if not (root_hostname := task.metadata.get("root_hostname")):
-            root_hostname = self.get_hostname(task.request.url)
+            root_hostname = cls.get_hostname(task.request.url)
             task.metadata["root_hostname"] = root_hostname
 
-        is_3rd_party = root_hostname != self.get_hostname(task.response.url)
+        is_3rd_party = root_hostname != cls.get_hostname(task.response.url)
         if is_3rd_party:
             task.results.clear()
         else:
@@ -75,9 +82,7 @@ class BinaryContent(Middleware):
 
     BINARY_CONTENT_TYPES = ["pdf", "zip", "audio", "image", "video"]
 
-    def process(self, task):
-        if task.response.headers["Content-Type"] in self.BINARY_CONTENT_TYPES:
+    @classmethod
+    def process(cls, task):
+        if task.response.headers["Content-Type"] in cls.BINARY_CONTENT_TYPES:
             task.metadata["drop"] = True  # Drop this request
-
-
-# TODO: enqueue-drop-decorator wraps and checks for metadata["drop"] then acts accordingly
