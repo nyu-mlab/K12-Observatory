@@ -76,7 +76,7 @@ class BinaryContent(Middleware):
     BINARY_CONTENT_TYPES = ["pdf", "zip", "audio", "image", "video"]
 
     def process(self, task):
-        if task.response.headers['Content-Type'] in self.BINARY_CONTENT_TYPES:
+        if task.response.headers["Content-Type"] in self.BINARY_CONTENT_TYPES:
             task.metadata["drop"] = True  # Drop this request
 
 
