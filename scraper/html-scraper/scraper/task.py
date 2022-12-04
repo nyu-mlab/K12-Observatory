@@ -20,7 +20,7 @@ class Task:
         # TODO: log timestamp before sending
         # TODO: record self.response.elapsed info for scheduling
 
-        self.response: requests.Response = None
+        self.response: requests.Response | None = None
         self.results: list[Task] = []
         self.metadata = {}
 
