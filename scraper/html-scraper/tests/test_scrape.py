@@ -1,3 +1,4 @@
+import graphlib
 import http.server
 import importlib
 import mimetypes
@@ -12,6 +13,7 @@ import pytest
 import requests
 
 import scraper
+
 mock = importlib.import_module("mock")
 
 
@@ -222,3 +224,41 @@ class TestScheduler:
     pass
     # TODO: scheduler behavior
     # TODO: queue persistence
+
+
+class TestComponent:
+
+    def test_creation(self, monkeypatch):
+        monkeypatch.setattr(scraper.component.Component, "__abstractmethods__",
+                            frozenset())
+        # assert no exceptions
+        for mw in (
+                graphlib.TopologicalSorter({
+                    scraper.crawler_middleware.Depth():
+                        (scraper.crawler_middleware.Referer(),),
+                }),
+            {
+                scraper.crawler_middleware.Depth():
+                    (scraper.crawler_middleware.Referer(),),
+            },
+            (
+                scraper.crawler_middleware.Depth(),
+                scraper.crawler_middleware.Referer(),
+            ),
+            [
+                scraper.crawler_middleware.Depth(),
+                scraper.crawler_middleware.Referer(),
+            ],
+                tuple((scraper.crawler_middleware.Depth(),)),
+                list((scraper.crawler_middleware.Depth(),)),
+                None,
+        ):
+            scraper.component.Component(middleware=mw, n_worker=None)
+
+        # assert exceptions
+        for mw in (
+                1,
+                "abc",
+        ):
+            with pytest.raises(ValueError, match=f"{type(mw)}"):
+                scraper.component.Component(middleware=mw, n_worker=None)
