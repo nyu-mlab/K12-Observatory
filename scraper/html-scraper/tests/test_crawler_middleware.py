@@ -1,4 +1,5 @@
 import pytest
+
 import scraper.crawler_middleware as middleware
 import scraper.task
 

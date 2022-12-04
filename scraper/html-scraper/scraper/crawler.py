@@ -1,14 +1,15 @@
 """ tries to understand what the page is about
 including process and analyze textual content + key content tags and attributes
 """
-import scraper.crawler_middleware as middleware
 import scraper.task
+from scraper import crawler_middleware
+
 
 default_middleware = (
-    middleware.BinaryContent,
-    middleware.Depth,
-    middleware.ThirdParty,
-    middleware.Referer,
+    crawler_middleware.BinaryContent,
+    crawler_middleware.Depth,
+    crawler_middleware.ThirdParty,
+    crawler_middleware.Referer,
 )
 
 

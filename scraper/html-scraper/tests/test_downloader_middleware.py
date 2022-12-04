@@ -1,4 +1,5 @@
 import pytest
+
 import scraper.downloader_middleware as middleware
 import scraper.task
 

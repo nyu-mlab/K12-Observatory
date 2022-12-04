@@ -1,14 +1,14 @@
 """ visit (or "crawl") the page to find out what's on it
 """
-import scraper.downloader_middleware as middleware
 import scraper.task
+from scraper import downloader_middleware
 
 default_middleware = (
-    middleware.BinaryContent,
-    middleware.HttpError,
-    #middleware.HttpProxy,  # XXX: do we need this?
-    middleware.JsCrawl,
-    #middleware.UserAgent,  # XXX: do we need this?
+    downloader_middleware.BinaryContent,
+    downloader_middleware.HttpError,
+    #downloader_middleware.HttpProxy,  # XXX: do we need this?
+    downloader_middleware.JsCrawl,
+    #downloader_middleware.UserAgent,  # XXX: do we need this?
 )
 
 

@@ -1,7 +1,9 @@
 import importlib.resources
 import itertools
+
 import pandas as pd
 import pytest
+
 import scraper
 
 

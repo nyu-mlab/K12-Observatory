@@ -1,4 +1,5 @@
 import http.server
+import importlib
 import mimetypes
 import pathlib
 import re
@@ -6,13 +7,11 @@ import socket
 import threading
 import urllib.parse
 import weakref
+
 import pytest
 import requests
-import scraper
-try:
-    import mock
-except ModuleNotFoundError:
-    from utils import mock
+
+mock = importlib.import_module("mock")
 
 
 class Url:
