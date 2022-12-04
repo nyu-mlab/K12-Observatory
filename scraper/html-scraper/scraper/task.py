@@ -11,7 +11,6 @@ class Task:
         *,
         timeout=60,
         priority=1,
-        #referer=None, # TODO: move this to a middleware and log it in self.metadata
     ):
         self.request = request
         self.timeout = timeout
@@ -23,9 +22,6 @@ class Task:
 
         self.response: requests.Response = None
         self.results: list[Task] = []
-        self.metadata = {
-        }  # TODO: consider dropping "metadata" and use "self.<var>" directly for middleware data instead, since member variables does not need to be explicitly defined at __init__ anyway
-
-        # TODO: in some middleware: if is root request (no previous value set), set depth=1, root_hostname=hostname
+        self.metadata = {}
 
     # TODO: sort all property methods
