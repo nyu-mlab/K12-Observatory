@@ -1,3 +1,6 @@
+import http
+import mimetypes
+
 import pytest
 import requests
 import scraper.downloader_middleware as middleware
@@ -39,8 +42,22 @@ class TestBinaryContentMiddleware:
 
 
 class TestHttpErrorMiddleware:
-    # TODO:
-    _ = middleware.HttpError
+
+    def test_process(self, basic_task):
+        for status_code in (status.value for status in http.HTTPStatus):
+            task = basic_task()
+            task.response.status_code = status_code
+            middleware.HttpError.process(task)
+
+            if status_code < 400:
+                # some False value or the "drop" key doesn't even exist
+                if hasattr(task.metadata, "drop"):
+                    assert bool(task.metadata["drop"]) is not False
+                else:
+                    with pytest.raises(KeyError):
+                        print(task.metadata["drop"])
+            else:
+                assert task.metadata["drop"] is True
 
 
 @pytest.mark.skip(reason="yet to be integrated with the JS crawler")
