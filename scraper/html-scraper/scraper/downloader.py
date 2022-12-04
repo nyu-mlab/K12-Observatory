@@ -3,13 +3,13 @@
 import scraper.downloader_middleware as middleware
 import scraper.task
 
-default_middleware = [
+default_middleware = (
     middleware.BinaryContent,
     middleware.HttpError,
     #middleware.HttpProxy,  # XXX: do we need this?
     middleware.JsCrawl,
     #middleware.UserAgent,  # XXX: do we need this?
-]
+)
 
 
 class Downloader:

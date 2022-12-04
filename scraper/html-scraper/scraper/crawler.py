@@ -4,12 +4,12 @@ including process and analyze textual content + key content tags and attributes
 import scraper.crawler_middleware as middleware
 import scraper.task
 
-default_middleware = [
+default_middleware = (
     middleware.BinaryContent,
     middleware.Depth,
     middleware.ThirdParty,
     middleware.Referer,
-]
+)
 
 
 class Crawler:
