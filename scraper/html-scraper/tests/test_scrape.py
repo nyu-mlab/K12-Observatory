@@ -132,6 +132,19 @@ class TestDownloader:
 
     # TODO: test result persistence
 
+    def test_drop_dead_links(self, mock_site):
+        """
+        main---page1      (O)
+         |- main---page2  (X)
+        """
+
+        main_site = mock_site(
+            "main",
+            {
+                "page1": (Url("main", "page2")),
+            },
+        )
+
 
 class TestCrawler:
 
@@ -202,19 +215,3 @@ class TestScheduler:
     pass
     # TODO: scheduler behavior
     # TODO: queue persistence
-
-
-class TestDownloader:
-
-    def test_drop_dead_links(self, mock_site):
-        """
-        main---page1      (O)
-         |- main---page2  (X)
-        """
-
-        main_site = mock_site(
-            "main",
-            {
-                "page1": (Url("main", "page2")),
-            },
-        )
