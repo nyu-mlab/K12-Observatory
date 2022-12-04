@@ -11,6 +11,7 @@ import weakref
 import pytest
 import requests
 
+import scraper
 mock = importlib.import_module("mock")
 
 
@@ -145,6 +146,9 @@ class TestDownloader:
             },
         )
 
+    def test_PLACEHOLDER(self):
+        scraper.Downloader(None)
+
 
 class TestCrawler:
 
@@ -209,6 +213,9 @@ class TestCrawler:
                 "page1": (Url("main", "page2")),
             },
         )
+
+    def test_PLACEHOLDER(self):
+        scraper.Crawler(None)
 
 
 class TestScheduler:

@@ -3,9 +3,10 @@ including process and analyze textual content + key content tags and attributes
 """
 import copy
 import graphlib
-import multiprocessing as mp
 
 import scraper.task
+
+from scraper import component
 from scraper import crawler_middleware
 
 
@@ -17,22 +18,34 @@ default_middleware = graphlib.TopologicalSorter({
 })
 
 
-class Crawler:
+class Crawler(component.Component):
     """Crawler"""
 
-    def __init__(self,
-                 n_worker: int = None,
-                 middleware: graphlib.TopologicalSorter = default_middleware):
-        middleware.prepare()
-        self.middleware = middleware
-
-    def parse(self, task: scraper.task.Task):
+    @classmethod
+    def _process(cls, task: scraper.task.Task) -> scraper.task.Task:
         if task.metadata.get("drop"):
             return None
 
         pass
 
-        middleware = copy.copy(self.middleware)
+        middleware = copy.copy(cls.middleware)
         # TODO: parallelize with DAG
         for mw_task in middleware.static_order():
             mw_task.process(task)
+
+        return task
+
+    def process(self, task: scraper.task.Task):
+
+        def callback(result):
+            # TODO: don't use return-None as request-filter behavior
+            if result is not None:
+                self.finished_queue.put(result)
+
+        def error_handler(err):
+            raise err  #TODO:
+
+        self.worker_pool.apply_async(self._process,
+                                     task,
+                                     callback=callback,
+                                     error_callback=error_handler)

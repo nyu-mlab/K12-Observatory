@@ -66,20 +66,20 @@ class TestStartUrlAssembly:
 
     def test_concat_multiple_lists(self):
         expected_url_set = {"aaa", "bbb", "ccc", "ddd"}
-        result = scraper.scrape.StartURLs(["aaa", "bbb"], ["ccc", "ddd"]).urls
+        result = scraper.target.StartURLs(["aaa", "bbb"], ["ccc", "ddd"]).urls
         assert expected_url_set == result
         assert expected_url_set == result
 
     def test_concat_list_of_lists(self, random_str_group):
         fixture_ans = set(itertools.chain.from_iterable(random_str_group))
-        result = scraper.scrape.StartURLs(*random_str_group).urls
+        result = scraper.target.StartURLs(*random_str_group).urls
         assert fixture_ans == set(result)
         assert fixture_ans == result
 
     def test_concat_real_data(self, data_dir):
         """test normal usage"""
         # example setup
-        start_urls = scraper.scrape.StartURLs(
+        start_urls = scraper.target.StartURLs(
             scraper.target.extract(
                 data_dir=data_dir,
                 usecols=["Website"],
@@ -94,7 +94,7 @@ class TestStartUrlAssembly:
     def test_shuffle(self, random_str_group, seed):
         # TODO: replace with 'hypothisis'
         fixture_ans = set(itertools.chain.from_iterable(random_str_group))
-        random_result = scraper.scrape.StartURLs(*random_str_group,
+        random_result = scraper.target.StartURLs(*random_str_group,
                                                  shuffle=True,
                                                  random_seed=seed).urls
 

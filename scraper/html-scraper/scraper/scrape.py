@@ -8,21 +8,50 @@ import scraper
 
 class Scraper:
 
-    def __init__(self, start_urls: StartURLs, *args, **kwargs):
-        pass
+    def __init__(
+        self,
+        start_urls: scraper.target.StartURLs,
+        crawler: scraper.Crawler,
+        downloader: scraper.Downloader,
+        scheduler,
+        *args,
+        **kwargs,
+    ):
+
+        # Piping scheduler, downloader, and crawler
+        crawler.task_queue = downloader.finish_queue
+        scheduler.task_queue = crawler.finish_queue
+
+        self.crawler = crawler
+        self.downloader = downloader
+        self.scheduler = scheduler
+
+        for url in start_urls:
+            self.scheduler.process(url)
 
 
 def scrape():
 
     Scraper(
-        StartURLs(
+        scraper.target.StartURLs(
             scraper.target.extract(
                 data_dir=importlib.resources.files(scraper.targets),
                 usecols=["Website"],
                 dtype={"Website": "string"},
+                # FIXME: nrows=2 for testing purpose
+                nrows=2,
             )),
-        scraper.Crawler(),
-        scraper.Downloader(),
+        crawler=scraper.Crawler(
+            # FIXME: n_worker=1 for testing purpose
+            n_worker=1,
+            middleware=scraper.crawler.default_middleware,
+        ),
+        downloader=scraper.Downloader(
+            # FIXME: n_worker=1 for testing purpose
+            n_worker=1,
+            middleware=scraper.downloader.default_middleware,
+        ),
+        scheduler=None,  # FIXME:
     )
 
     # TODO: move these to performance profiling code
