@@ -84,5 +84,7 @@ class BinaryContent(Middleware):
 
     @classmethod
     def process(cls, task):
-        if task.response.headers["Content-Type"] in cls.BINARY_CONTENT_TYPES:
+        content_type = task.response.headers["Content-Type"]
+        if any(binary_type in content_type
+               for binary_type in cls.BINARY_CONTENT_TYPES):
             task.metadata["drop"] = True  # Drop this request
