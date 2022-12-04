@@ -1,13 +1,6 @@
 import graphlib
-import http.server
 import importlib
-import mimetypes
-import pathlib
 import re
-import socket
-import threading
-import urllib.parse
-import weakref
 
 import pytest
 import requests
@@ -15,87 +8,7 @@ import requests
 import scraper
 
 mock = importlib.import_module("mock")
-
-
-class Url:
-    """Custom URL expression from HTTPServer and resource path"""
-    servers: weakref.WeakValueDictionary[
-        str, http.server.HTTPServer |
-        http.server.ThreadingHTTPServer] = weakref.WeakValueDictionary()
-
-    def __init__(self, server_name: str, path: str):
-        self.server_name = server_name
-        self.path = urllib.parse.quote(path)
-
-    def __str__(self):
-        """Runtime server lookup and URL generation"""
-        server = self.servers[self.server_name]
-        assert server.address_family in (socket.AF_INET, socket.AF_INET6)
-        return f"http://localhost:{server.server_address[1]}/{self.path}"
-
-
-def build_html(path: str, links: list[Url]) -> str:
-    return mock.template.render(
-        title=path,
-        links=(dict(href=str(link), caption=str(link)) for link in links),
-    )
-
-
-def handler_factory(handler_dict: dict[str, Url]):
-    # TODO: give more responses, such as certain paths that trigger different responses and status codes, to test the scraper under different conditions (how to react when the status is 2/3/4/5XX)
-    # TODO: if we are implementing various responses, we might as well replace the built-in http module with a serious server, maybe Flask or Tornado? want it to be as lightweight as possible though
-    def request_handler(self):
-        path = self.path.lstrip("/")
-        print("got request:", path)
-
-        static_resource_dir = pathlib.Path(mock.__file__).parent / "static"
-        if (static_file := static_resource_dir / path).is_file():
-            self.send_response(200)
-            self.send_header("Content-type", mimetypes.guess_type(path))
-            self.end_headers()
-            self.wfile.write(static_file.read_bytes())
-
-        elif path in handler_dict:
-            self.send_response(200)
-            self.send_header("Content-type", "text/html")
-            self.end_headers()
-            self.wfile.write((build_html(path, handler_dict[path])).encode())
-
-        else:
-            self.send_error(404)
-
-    return request_handler
-
-
-@pytest.fixture(scope="function")
-def mock_site(request):
-
-    def _mock_site(name: str, pages: dict[str, Url]):
-
-        request_handler = type("HTTPRequestHandler",
-                               (http.server.BaseHTTPRequestHandler,),
-                               dict(do_GET=handler_factory(pages)))
-        # NOTE: the context manager of HTTPServer is merely a "pass" statement, skip the "with" statement
-        server = http.server.HTTPServer(("", 0), request_handler)
-        Url.servers[name] = server
-        print("Serving on port:", server.server_address[1])
-
-        thread = threading.Thread(target=server.serve_forever,
-                                  kwargs=dict(poll_interval=0.1))
-        thread.start()
-
-        def stop_server():
-            assert thread.is_alive()
-            server.shutdown()
-            server.server_close()
-            # NOTE: serve_forever() default "poll_interval" is 0.5 sec
-            thread.join(0.2)
-            assert not thread.is_alive()
-
-        request.addfinalizer(stop_server)
-        return server
-
-    return _mock_site
+mock_site = mock.site
 
 
 class TestMockSite:
@@ -110,14 +23,14 @@ class TestMockSite:
         main_site = mock_site(
             "main",
             {
-                "page1": (Url("main", "page2"),),
-                "page2": (Url("main", "page3"),),
+                "page1": (mock.Url("main", "page2"),),
+                "page2": (mock.Url("main", "page3"),),
                 "page3": (),
             },
         )
 
         for i in range(1, 4):
-            path = Url("main", f"page{i}")
+            path = mock.Url("main", f"page{i}")
             print(path, repr(path), str(path))
             r = requests.get(str(path), timeout=(0.1, 0.1))
 
@@ -144,7 +57,7 @@ class TestDownloader:
         main_site = mock_site(
             "main",
             {
-                "page1": (Url("main", "page2")),
+                "page1": (mock.Url("main", "page2")),
             },
         )
 
@@ -167,9 +80,9 @@ class TestCrawler:
         main_site = mock_site(
             "main",
             {
-                "page1": (Url("main", "page2"), Url("main", "page3")),
-                "page2": (Url("main", "page4"),),
-                "page3": (Url("main", "page5"),),
+                "page1": (mock.Url("main", "page2"), mock.Url("main", "page3")),
+                "page2": (mock.Url("main", "page4"),),
+                "page3": (mock.Url("main", "page5"),),
                 "page4": (),
                 "page5": (),
             },
@@ -189,7 +102,7 @@ class TestCrawler:
         main_site = mock_site(
             "main",
             {
-                "page1": (Url("third_party_1", "page1")),
+                "page1": (mock.Url("third_party_1", "page1")),
                 "page2": (),
             },
         )
@@ -197,8 +110,8 @@ class TestCrawler:
             "third_party_1",
             {
                 "page1": (
-                    Url("third_party_1", "page2"),
-                    Url("third_party_2", "page1"),
+                    mock.Url("third_party_1", "page2"),
+                    mock.Url("third_party_2", "page1"),
                 ),
                 "page2": (),
             },
@@ -212,7 +125,7 @@ class TestCrawler:
         third_party_site3 = mock_site(
             "third_party_3",
             {
-                "page1": (Url("main", "page2")),
+                "page1": (mock.Url("main", "page2")),
             },
         )
 
