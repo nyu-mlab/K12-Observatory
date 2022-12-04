@@ -4,7 +4,7 @@ including process and analyze textual content + key content tags and attributes
 import scraper.crawler_middleware as middleware
 import scraper.task
 
-middleware = [
+default_middleware = [
     middleware.BinaryContent,
     middleware.Depth,
     middleware.ThirdParty,
@@ -14,7 +14,7 @@ middleware = [
 
 class Crawler:
 
-    def __init__(self, n_worker=1):
+    def __init__(self, n_worker=1, middleware=default_middleware):
         pass
 
     def parse(self, task: scraper.task.Task):

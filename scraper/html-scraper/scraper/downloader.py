@@ -3,7 +3,7 @@
 import scraper.downloader_middleware as middleware
 import scraper.task
 
-middleware = [
+default_middleware = [
     middleware.BinaryContent,
     middleware.HttpError,
     #middleware.HttpProxy,  # XXX: do we need this?
@@ -14,7 +14,7 @@ middleware = [
 
 class Downloader:
 
-    def __init__(self, n_worker=1):
+    def __init__(self, n_worker=1, middleware=default_middleware):
         pass
 
     def process(self, task: scraper.task.Task):
