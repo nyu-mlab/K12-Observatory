@@ -1,8 +1,41 @@
 """Target acquisition
 """
 import itertools
+import random
 
 import pandas as pd
+
+
+class StartURLs:
+    """Lists of URLs to start from.
+    """
+
+    def __init__(self, *argv, shuffle=False, random_seed=None):
+        """argv is a list of list of URLs,
+        e.g.
+        StartURLs(
+            [
+                "aaa",
+                "bbb",
+            ],
+            [
+                "ccc",
+                "ddd",
+            ],
+        )
+        """
+        self.urls = set(itertools.chain(*argv))
+
+        if shuffle:
+            random.seed(random_seed)
+            self.urls = list(self.urls)
+            random.shuffle(self.urls)
+
+    def __iter__(self):
+        return iter(self.urls)
+
+    def __repr__(self) -> str:
+        return repr(self.urls)
 
 
 class TargetAcquisitionHelper:
