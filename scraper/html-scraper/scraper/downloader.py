@@ -1,5 +1,6 @@
 """ visit (or "crawl") the page to find out what's on it
 """
+import copy
 import graphlib
 import multiprocessing as mp
 
@@ -29,3 +30,8 @@ class Downloader:
             return None
 
         pass
+
+        middleware = copy.copy(self.middleware)
+        # TODO: parallelize with DAG
+        for mw_task in middleware.static_order():
+            mw_task.procsess(task)

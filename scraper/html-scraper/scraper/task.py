@@ -5,6 +5,7 @@ import requests
 
 class Task:
     """Basic unit of encapsulation and serialization/deserialization"""
+    # TODO: make "Task" objects safe for parallelization
 
     def __init__(
         self,
