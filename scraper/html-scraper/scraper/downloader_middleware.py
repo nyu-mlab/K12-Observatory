@@ -48,6 +48,8 @@ class BinaryContent(Middleware):
     @classmethod
     def process(cls, task):
         resource_path = urllib.parse.urlparse(task.response.url).path
-        if pathlib.PurePath(
-                resource_path).suffix in cls.BINARY_CONTENT_EXTENSIONS:
+        resource_extension = pathlib.PurePath(resource_path).suffix
+
+        if any(binary_extension in resource_extension
+               for binary_extension in cls.BINARY_CONTENT_EXTENSIONS):
             task.metadata["drop"] = True  # Drop this request
