@@ -1,4 +1,4 @@
-# Scraper that only obtains the HTML contents without evaluating the JS code
+# Scraper that only obtains the HTML contents without evaluating the JS code [![test-html-scraper](https://github.com/nyu-mlab/K12-Observatory/actions/workflows/test-html-scraper.yml/badge.svg?branch=main&event=push)](https://github.com/nyu-mlab/K12-Observatory/actions/workflows/test-html-scraper.yml)
 
 Owner: Tim
 

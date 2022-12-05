@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - "scraper/html-scraper/**"
+      - "!scraper/html-scraper/**.md"
       - "raw-input-data/**"
 
 permissions:
