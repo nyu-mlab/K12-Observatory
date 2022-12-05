@@ -33,7 +33,7 @@ class JsCrawl(Middleware):
     # NOTE: REF: https://developers.google.com/search/docs/ajax-crawling/docs/getting-started
 
     @classmethod
-    def process(cls, task):
+    def process(cls, task):  # pragma: no cover
         pass
 
 
