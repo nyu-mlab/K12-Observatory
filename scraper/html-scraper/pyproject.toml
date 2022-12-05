@@ -57,6 +57,9 @@ concurrency = [
     "multiprocessing",
 ]
 cover_pylib = true
+omit = [
+    "scraper/perf.py",
+]
 
 [tool.coverage.report]
 show_missing = true
