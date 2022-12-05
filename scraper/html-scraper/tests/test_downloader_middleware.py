@@ -1,5 +1,7 @@
 import http
 import mimetypes
+import pathlib
+import urllib.parse
 
 import pytest
 import requests
@@ -37,8 +39,48 @@ class TestMiddlewareBaseClass:
 
 
 class TestBinaryContentMiddleware:
-    # TODO:
-    _ = middleware.BinaryContent
+
+    def test_process(self, basic_task):
+        for file_extension in (mimetypes.types_map |
+                               mimetypes.common_types).keys():
+            task = basic_task()
+
+            parsed_request = urllib.parse.urlparse(task.request.url)
+            task.request.url = urllib.parse.urlunparse((
+                parsed_request.scheme,
+                parsed_request.netloc,
+                str(
+                    pathlib.PurePath(
+                        parsed_request.path).with_suffix(file_extension)),
+                parsed_request.params,
+                parsed_request.query,
+                parsed_request.fragment,
+            ))
+
+            parsed_response = urllib.parse.urlparse(task.response.url)
+            task.response.url = urllib.parse.urlunparse((
+                parsed_response.scheme,
+                parsed_response.netloc,
+                str(
+                    pathlib.PurePath(
+                        parsed_response.path).with_suffix(file_extension)),
+                parsed_response.params,
+                parsed_response.query,
+                parsed_response.fragment,
+            ))
+
+            middleware.BinaryContent.process(task)
+
+            if any(bin_ext in file_extension for bin_ext in
+                   middleware.BinaryContent.BINARY_CONTENT_EXTENSIONS):
+                assert task.metadata["drop"] is True
+            else:
+                # some False value or the "drop" key doesn't even exist
+                if hasattr(task.metadata, "drop"):
+                    assert bool(task.metadata["drop"]) is not False
+                else:
+                    with pytest.raises(KeyError):
+                        print(task.metadata["drop"])
 
 
 class TestHttpErrorMiddleware:
