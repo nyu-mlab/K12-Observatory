@@ -3,6 +3,7 @@
 import copy
 import graphlib
 
+import requests
 import scraper.task
 
 from scraper import component
@@ -25,7 +26,10 @@ class Downloader(component.Component):
         if task.metadata.get("drop"):
             return None
 
-        pass
+        with requests.Session() as session:
+            task.response = session.send(task.request.prepare(),
+                                         timeout=task.timeout)
+        # TODO: FIXME: send request
 
         middleware = copy.copy(cls.middleware)
         # TODO: parallelize with DAG

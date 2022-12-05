@@ -9,6 +9,8 @@ import scraper.task
 from scraper import component
 from scraper import crawler_middleware
 
+# TODO: replace this with something faster like "lxml" or "parsel"
+from bs4 import BeautifulSoup
 
 default_middleware = graphlib.TopologicalSorter({
     crawler_middleware.BinaryContent(): (),
@@ -26,7 +28,8 @@ class Crawler(component.Component):
         if task.metadata.get("drop"):
             return None
 
-        pass
+        soup = BeautifulSoup(task.response.text, features="html.parser")
+        # TODO: FIXME: parse html to get urls
 
         middleware = copy.copy(cls.middleware)
         # TODO: parallelize with DAG
