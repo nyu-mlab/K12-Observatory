@@ -163,10 +163,85 @@ class TestRefererMiddleware:
 
 class TestThirdPartyMiddleware:
 
-    @pytest.mark.skip("WIP")
-    def test_process(self, basic_task):
-        task = basic_task()
-        processed_task = middleware.ThirdParty.process(task)
+    def test_process_root_request(self, basic_task):
+        """Init root request root_hostname"""
+
+        root_task = basic_task()
+        registered_domain = "nyu.edu"
+        subdomain = "mlab.engineering"
+        root_task.request.url = f"https://{subdomain}.{registered_domain}/resource1"
+        root_task.response.url = f"https://{subdomain}.{registered_domain}/resource1"
+        with pytest.raises(KeyError):
+            print(root_task.metadata["root_hostname"])
+
+        middleware.ThirdParty.process(root_task)
+        assert root_task.metadata["root_hostname"] == registered_domain
+
+    def test_process_non_root_request(self, basic_task):
+        """Leave non root requests alone"""
+
+        registered_domain = "nyu.edu"
+        subdomain = "mlab.engineering"
+
+        # first party
+        non_root_1st_party_task = basic_task()
+        non_root_1st_party_task.request.url = f"https://{subdomain}.{registered_domain}/resource1"
+        non_root_1st_party_task.response.url = f"https://{subdomain}.{registered_domain}/resource1"
+        non_root_1st_party_task.metadata["root_hostname"] = registered_domain
+
+        middleware.ThirdParty.process(non_root_1st_party_task)
+        assert non_root_1st_party_task.metadata[
+            "root_hostname"] == registered_domain
+
+        # third party
+        another_registered_domain = "columbia.edu"
+        assert another_registered_domain != registered_domain
+        non_root_3rd_party_task = basic_task()
+        non_root_3rd_party_task.request.url = f"https://{subdomain}.{another_registered_domain}/resource1"
+        non_root_3rd_party_task.response.url = f"https://{subdomain}.{another_registered_domain}/resource1"
+        non_root_3rd_party_task.metadata["root_hostname"] = registered_domain
+
+        middleware.ThirdParty.process(non_root_3rd_party_task)
+        assert non_root_3rd_party_task.metadata[
+            "root_hostname"] == registered_domain
+
+    def test_set_root_hostname_for_children_of_first_party_request(
+            self, basic_task):
+        first_party_task = basic_task()
+        registered_domain = "nyu.edu"
+        subdomain = "mlab.engineering"
+        first_party_task.request.url = f"https://{subdomain}.{registered_domain}/resource1"
+        first_party_task.response.url = f"https://{subdomain}.{registered_domain}/resource1"
+        first_party_task.results = list(
+            (scraper.task.Task(requests.Request()),)) * 4
+        assert len(first_party_task.results) != 0
+
+        middleware.ThirdParty.process(first_party_task)
+        assert len(first_party_task.results) != 0
+        assert all(subtask.metadata["root_hostname"] == registered_domain
+                   for subtask in first_party_task.results)
+
+    def test_clear_children_of_third_party_request(self, basic_task):
+        third_party_task = basic_task()
+        registered_domain = "nyu.edu"
+        subdomain = "mlab.engineering"
+        third_party_task.request.url = f"https://{subdomain}.{registered_domain}/resource1"
+        third_party_task.response.url = f"https://{subdomain}.{registered_domain}/resource1"
+        another_registered_domain = "columbia.edu"
+        assert another_registered_domain != registered_domain
+        third_party_task.metadata["root_hostname"] = another_registered_domain
+
+        third_party_task.results = list(
+            (scraper.task.Task(requests.Request()),)) * 4
+
+        middleware.ThirdParty.process(third_party_task)
+        assert len(third_party_task.results) == 0
+
+    @pytest.mark.skip("TODO")
+    def test_filter_third_party_children_and_set_root_hostname_for_first_party_children_of_third_party_request(
+            self, basic_task):
+        """TODO: what's the desired behavior?"""
+        pass
 
 
 # TODO: add tests for all middleware for redirections: request.url and response.url (1)have different subdomains (2)are in different domains
