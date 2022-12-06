@@ -40,6 +40,7 @@ class TestMockSite:
 
 
 class TestDownloader:
+    # TODO: move to its own file
 
     # TODO: test scraping mock server for single page, then halt and inspect
     @pytest.mark.skip(reason="WIP")
@@ -66,6 +67,7 @@ class TestDownloader:
 
 
 class TestCrawler:
+    # TODO: move to its own file
 
     # TODO: test scraping mock server for automated-whole-site scraping, then inspect site map
     def test_crawls_links(self, mock_site):
@@ -134,12 +136,14 @@ class TestCrawler:
 
 
 class TestScheduler:
+    # TODO: move to its own file
     pass
     # TODO: scheduler behavior
     # TODO: queue persistence
 
 
 class TestComponent:
+    # TODO: move to its own file
 
     def test_creation(self, monkeypatch):
         monkeypatch.setattr(scraper.component.Component, "__abstractmethods__",

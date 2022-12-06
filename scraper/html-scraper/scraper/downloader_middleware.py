@@ -24,8 +24,9 @@ class HttpError(Middleware):
 
     @classmethod
     def process(cls, task):
+        # TODO: do more checking for subcases?
         if not task.response.ok:
-            task.metadata["drop"] = True  # Drop this request
+            task.metadata["drop"] = True
 
 
 class JsCrawl(Middleware):
@@ -52,4 +53,4 @@ class BinaryContent(Middleware):
 
         if any(binary_extension in resource_extension
                for binary_extension in cls.BINARY_CONTENT_EXTENSIONS):
-            task.metadata["drop"] = True  # Drop this request
+            task.metadata["drop"] = True

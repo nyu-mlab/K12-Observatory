@@ -106,3 +106,6 @@ class TestHttpErrorMiddleware:
 class TestJsCrawlMiddleware:
     # TODO:
     _ = middleware.JsCrawl
+
+
+# TODO: add tests for all middleware for redirections: request.url and response.url (1)have different subdomains (2)are in different domains

@@ -167,3 +167,6 @@ class TestThirdPartyMiddleware:
     def test_process(self, basic_task):
         task = basic_task()
         processed_task = middleware.ThirdParty.process(task)
+
+
+# TODO: add tests for all middleware for redirections: request.url and response.url (1)have different subdomains (2)are in different domains

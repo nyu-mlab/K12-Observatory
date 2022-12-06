@@ -10,6 +10,7 @@ import scraper
 @pytest.fixture
 def data_dir():
     assert (datadir := importlib.resources.files(scraper.targets)).is_dir()
+    # NOTE: data_dir fixture returns a "importlib.resources.abc.Traversable" instance, not "pathlib.Path", consider casting its member "._paths" path list to pathlib types
     return datadir
 
 
@@ -82,6 +83,7 @@ class TestStartUrlAssembly:
         assert fixture_ans == result
 
     def test_concat_real_data(self, data_dir):
+        # FIXME: STILL TAKES TOO LONG TO EXECUTE
         """test normal usage"""
         # example setup
         start_urls = scraper.target.StartURLs(

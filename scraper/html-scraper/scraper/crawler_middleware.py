@@ -9,6 +9,8 @@ import scraper.task
 import tldextract
 
 
+# TODO: do some parallelization, use DAG to explore chances
+# (need partial order with DAG because some operations like depth-based-priority-modifying needs to be executed after depth-middleware)
 class Middleware(abc.ABC):
 
     @classmethod
@@ -28,7 +30,7 @@ class Depth(Middleware):
             current_depth = 0
             task.metadata["depth"] = current_depth
 
-        for spawned_task in task.results:  # discovered URLs
+        for spawned_task in task.results:
             spawned_task.metadata["depth"] = current_depth + 1
 
 
@@ -87,4 +89,4 @@ class BinaryContent(Middleware):
         content_type = task.response.headers["Content-Type"]
         if any(binary_type in content_type
                for binary_type in cls.BINARY_CONTENT_TYPES):
-            task.metadata["drop"] = True  # Drop this request
+            task.metadata["drop"] = True
