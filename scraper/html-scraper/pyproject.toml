@@ -12,7 +12,7 @@ dependencies = [
     "tldextract",
     "beautifulsoup4",
 ]
-dynamic = ["version"]
+version = "0.1"
 
 [project.optional-dependencies]
 dev = [
