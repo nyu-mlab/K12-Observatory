@@ -34,8 +34,6 @@ python scraper/scrape.py
 
 ## Develop
 ```bash
-pip install -e .
-pip install -e ".[dev]"
-pip install -e ".[tests]"
+pip install -e ".[dev,tests]"
 pytest
 ```
