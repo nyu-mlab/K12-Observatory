@@ -1,0 +1,24 @@
+services:
+  test:
+    build:
+      context: .
+      dockerfile: test.dockerfile
+    volumes:
+      - type: bind
+        source: "${PWD}/scraper/html-scraper/scraper"
+        target: /app/scraper
+        read_only: true
+        bind:
+          create_host_path: false
+      - type: bind
+        source: "${PWD}/raw-input-data"
+        target: /app/scraper/targets
+        read_only: true
+        bind:
+          create_host_path: false
+      - type: bind
+        source: "${PWD}/scraper/html-scraper/tests"
+        target: /app/tests
+        read_only: true
+        bind:
+          create_host_path: false
