@@ -5,6 +5,7 @@ on:
     branches:
       - main
     paths:
+      - ".github/**"
       - "scraper/html-scraper/**"
       - "!scraper/html-scraper/**.md"
       - "raw-input-data/**"
@@ -19,7 +20,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-22.04, macos-12]
         python-version: ["3.10"]
 
     steps:
