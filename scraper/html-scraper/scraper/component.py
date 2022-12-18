@@ -1,4 +1,4 @@
-""" processing unit
+""" Building blocks
 """
 import abc
 import graphlib
@@ -7,9 +7,11 @@ import multiprocessing as mp
 
 import scraper.task
 
+# TODO: rename file
 
-class Component(abc.ABC):
-    """processing unit"""
+
+class WorkerBase(abc.ABC):
+    """Remote worker base class"""
 
     def __init__(
         self,

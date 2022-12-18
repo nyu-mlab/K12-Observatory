@@ -18,7 +18,7 @@ default_middleware = graphlib.TopologicalSorter({
 })
 
 
-class Downloader(component.Component):
+class Downloader(component.WorkerBase):
     """Downloader"""
 
     @classmethod

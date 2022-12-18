@@ -142,11 +142,11 @@ class TestScheduler:
     # TODO: queue persistence
 
 
-class TestComponent:
+class TestWorker:
     # TODO: move to its own file
 
     def test_creation(self, monkeypatch):
-        monkeypatch.setattr(scraper.component.Component, "__abstractmethods__",
+        monkeypatch.setattr(scraper.component.WorkerBase, "__abstractmethods__",
                             frozenset())
         # assert no exceptions
         for mw in (
@@ -170,7 +170,7 @@ class TestComponent:
                 list((scraper.crawler_middleware.Depth(),)),
                 None,
         ):
-            scraper.component.Component(middleware=mw, n_worker=None)
+            scraper.component.WorkerBase(middleware=mw, n_worker=None)
 
         # assert exceptions
         for mw in (
@@ -178,4 +178,4 @@ class TestComponent:
                 "abc",
         ):
             with pytest.raises(ValueError, match=f"{type(mw)}"):
-                scraper.component.Component(middleware=mw, n_worker=None)
+                scraper.component.WorkerBase(middleware=mw, n_worker=None)

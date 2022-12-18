@@ -20,7 +20,7 @@ default_middleware = graphlib.TopologicalSorter({
 })
 
 
-class Crawler(component.Component):
+class Crawler(component.WorkerBase):
     """Crawler"""
 
     @classmethod
