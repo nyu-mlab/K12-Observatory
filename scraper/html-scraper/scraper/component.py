@@ -56,8 +56,8 @@ class WorkerBase(abc.ABC):
     @classmethod
     @abc.abstractmethod
     def _process(cls, task: scraper.task.Task) -> scraper.task.Task:
-        pass
+        raise NotImplementedError
 
     @abc.abstractmethod
     def process(self, task: scraper.task.Task):
-        pass
+        raise NotImplementedError

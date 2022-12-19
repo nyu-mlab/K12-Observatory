@@ -34,8 +34,8 @@ class TestMiddlewareBaseClass:
     def test_duck_type_methods(self):
         # exists an abstract classmethod function called "process"
         assert callable(middleware.Middleware.process)
-        assert "process" in middleware.Middleware.__abstractmethods__
-        middleware.Middleware.process(None)
+        with pytest.raises(NotImplementedError):
+            middleware.Middleware.process(None)
 
 
 class TestBinaryContentMiddleware:

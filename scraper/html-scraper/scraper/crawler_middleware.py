@@ -16,7 +16,7 @@ class Middleware(abc.ABC):
     @classmethod
     @abc.abstractmethod
     def process(cls, task: scraper.task.Task):
-        pass
+        raise NotImplementedError
 
 
 # TODO: enqueue-drop-decorator wraps and checks for metadata["drop"] then acts accordingly
