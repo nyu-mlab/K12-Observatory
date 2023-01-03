@@ -12,6 +12,7 @@ mock_site = mock.site
 
 
 class TestMockSite:
+    """fake site generator"""
 
     def test_server_reply(self, mock_site):
         """
@@ -40,7 +41,6 @@ class TestMockSite:
 
 
 class TestDownloader:
-    # TODO: move to its own file
 
     # TODO: test scraping mock server for single page, then halt and inspect
     @pytest.mark.skip(reason="WIP")
@@ -67,7 +67,6 @@ class TestDownloader:
 
 
 class TestCrawler:
-    # TODO: move to its own file
 
     # TODO: test scraping mock server for automated-whole-site scraping, then inspect site map
     def test_crawls_links(self, mock_site):
@@ -148,7 +147,7 @@ class TestWorker:
     def test_creation(self, monkeypatch):
         Worker = scraper.processor.BaseWorker
         monkeypatch.setattr(Worker, "__abstractmethods__", frozenset())
-        # assert no exceptions
+        # assert no exceptions when constructing with graph/dict/tuple/list
         for mw in (
                 graphlib.TopologicalSorter({
                     scraper.crawler_middleware.Depth():

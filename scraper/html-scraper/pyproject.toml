@@ -24,7 +24,7 @@ tests = [
     "pytest-cov",
     "coverage[toml]",
     "hypothesis",
-    "jinja2",
+    "Jinja2",
 ]
 
 [project.scripts]
@@ -40,11 +40,13 @@ include = ["scraper"]
 
 [tool.pytest.ini_options]
 addopts = [
-    "-v",
+    "--verbose",
     "--show-capture=stdout",
     # "--capture=tee-sys",
     "--import-mode=importlib",
     "--cov=scraper",
+    "--durations=0",
+    "--durations-min=0.01",
 ]
 pythonpath = [
     "scraper",
