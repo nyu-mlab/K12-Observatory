@@ -10,7 +10,7 @@ import scraper.task
 # TODO: rename file
 
 
-class WorkerBase(abc.ABC):
+class BaseWorker(abc.ABC):
     """Remote worker base class"""
 
     def __init__(

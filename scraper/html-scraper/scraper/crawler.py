@@ -6,7 +6,7 @@ import graphlib
 
 import scraper.task
 
-from scraper import component
+from scraper import processor
 from scraper import crawler_middleware
 
 # TODO: replace this with something faster like "lxml" or "parsel"
@@ -20,7 +20,7 @@ default_middleware = graphlib.TopologicalSorter({
 })
 
 
-class Crawler(component.WorkerBase):
+class Crawler(processor.BaseWorker):
     """Crawler"""
 
     @classmethod

@@ -6,7 +6,7 @@ import graphlib
 import requests
 import scraper.task
 
-from scraper import component
+from scraper import processor
 from scraper import downloader_middleware
 
 default_middleware = graphlib.TopologicalSorter({
@@ -18,7 +18,7 @@ default_middleware = graphlib.TopologicalSorter({
 })
 
 
-class Downloader(component.WorkerBase):
+class Downloader(processor.BaseWorker):
     """Downloader"""
 
     @classmethod
