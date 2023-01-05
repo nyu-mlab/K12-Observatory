@@ -45,6 +45,7 @@ addopts = [
     # "--capture=tee-sys",
     "--import-mode=importlib",
     "--cov=scraper",
+    "-r fEX",
     "--durations=0",
     "--durations-min=0.01",
 ]
