@@ -39,19 +39,27 @@ where = ["."]
 include = ["scraper"]
 
 [tool.pytest.ini_options]
-addopts = [
-    "--verbose",
-    "--show-capture=all",
-    # "--capture=tee-sys",
-    "--import-mode=importlib",
-    "--cov=scraper",
-    "-r fExX",
-    "--durations=0",
-    "--durations-min=0.01",
-]
 pythonpath = [
     "scraper",
     "tests/utils",
+]
+addopts = [
+    # General
+    "--capture=tee-sys",
+    "--cache-clear",
+
+    # Reporting
+    "--durations=0",
+    "--durations-min=0.01",
+    "--verbose",
+    "-r fExX",
+    "--show-capture=all",
+
+    # Test collection
+    "--import-mode=importlib",
+
+    # Coverage
+    "--cov=scraper",
 ]
 
 [tool.coverage.run]
