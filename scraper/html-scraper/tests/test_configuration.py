@@ -119,7 +119,7 @@ class TestStartUrlAssembly:
         # essentially keeping (chance_of_original_order ** X) smaller or equal
         # to $TARGET_FALSE_POSITIVE_RATE
 
-        def successful_shuffle(dummy_arg):
+        def successful_shuffle():
             # Order did change
             random_result = scraper.target.StartURLs(*random_str_group,
                                                      shuffle=True,
@@ -129,16 +129,12 @@ class TestStartUrlAssembly:
 
             return string_list != random_result
 
-        if not any(
-                map(
-                    successful_shuffle,
-                    range(
-                        min(
-                            1,
-                            len(string_list) * 100,
-                            math.ceil(
-                                math.log(TARGET_FALSE_POSITIVE_RATE,
-                                         chance_of_original_order)),
-                        )),
-                )):
+        if not any(successful_shuffle() for i in range(
+                min(
+                    1,
+                    len(string_list) * 100,
+                    math.ceil(
+                        math.log(TARGET_FALSE_POSITIVE_RATE,
+                                 chance_of_original_order)),
+                ))):
             raise RuntimeError()
