@@ -4,6 +4,9 @@ import pytest
 import requests
 import scraper.crawler_middleware as middleware
 import scraper.task
+from opentelemetry import trace
+
+tracer = trace.get_tracer(__name__)
 
 
 # TODO: parametrize fixture with different tasks
@@ -242,6 +245,19 @@ class TestThirdPartyMiddleware:
             self, basic_task):
         """TODO: what's the desired behavior?"""
         pass
+
+    @pytest.mark.skip("too many calls")
+    @tracer.start_as_current_span(
+        "profile-root_domain_loopkup-cache_effectiveness")
+    def test_root_domain_loopkup_cache_effectiveness(self, basic_task):
+        registered_domain = "nyu.edu"
+        subdomain = "mlab.engineering"
+        url = f"https://{subdomain}.{registered_domain}/resource1"
+        for i in range(100):
+            root_task = basic_task()
+            root_task.request.url = url
+            root_task.response.url = url
+            middleware.ThirdParty.process(root_task)
 
 
 # TODO: add tests for all middleware for redirections: request.url and response.url (1)have different subdomains (2)are in different domains
