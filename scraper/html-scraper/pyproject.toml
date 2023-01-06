@@ -41,11 +41,11 @@ include = ["scraper"]
 [tool.pytest.ini_options]
 addopts = [
     "--verbose",
-    "--show-capture=stdout",
+    "--show-capture=all",
     # "--capture=tee-sys",
     "--import-mode=importlib",
     "--cov=scraper",
-    "-r fEX",
+    "-r fExX",
     "--durations=0",
     "--durations-min=0.01",
 ]
