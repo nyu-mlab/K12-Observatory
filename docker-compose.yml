@@ -22,3 +22,13 @@ services:
         read_only: true
         bind:
           create_host_path: false
+  trace:
+    image: jaegertracing/all-in-one:1.41
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+    ports:
+      - "127.0.0.1:5778:5778"    # agent configs
+      - "127.0.0.1:16686:16686"  # query frontend
+      - "127.0.0.1:4317:4317"    # OpenTelemetry collector over gRPC
+      - "127.0.0.1:4318:4318"    # OpenTelemetry collector over HTTP
+      - "127.0.0.1:14269:14269"  # admin control
