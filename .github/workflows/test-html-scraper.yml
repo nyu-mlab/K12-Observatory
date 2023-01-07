@@ -22,6 +22,7 @@ jobs:
       matrix:
         os: [ubuntu-22.04, macos-12]
         python-version: ["3.10"]
+        optional-dependencies: ["", ",trace"]
 
     steps:
       - uses: actions/checkout@v3
@@ -37,7 +38,7 @@ jobs:
         working-directory: ./scraper/html-scraper/
         run: |
           python -m pip install --upgrade pip
-          python -m pip install -e ".[tests]"
+          python -m pip install -e ".[test${{ matrix.optional-dependencies }}]"
 
       - name: Test with pytest
         working-directory: ./scraper/html-scraper/
@@ -48,4 +49,4 @@ jobs:
         working-directory: ./scraper/html-scraper/
         run: |
           pytest -m "slow"
-        if: startsWith(matrix.os, 'ubuntu-')
+        if: startsWith(matrix.os, 'ubuntu-') && matrix.optional-dependencies == ',trace'
