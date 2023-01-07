@@ -246,7 +246,7 @@ class TestThirdPartyMiddleware:
         """TODO: what's the desired behavior?"""
         pass
 
-    @pytest.mark.skip("too many calls")
+    @pytest.mark.profiling
     @tracer.start_as_current_span(
         "profile-root_domain_loopkup-cache_effectiveness")
     def test_root_domain_loopkup_cache_effectiveness(self, basic_task):

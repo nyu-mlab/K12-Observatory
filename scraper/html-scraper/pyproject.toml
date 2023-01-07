@@ -48,6 +48,10 @@ pythonpath = [
     "scraper",
     "tests/utils",
 ]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "profiling: mark tests for profiling",
+]
 addopts = [
     # General
     "--capture=tee-sys",
@@ -59,6 +63,7 @@ addopts = [
     "--verbose",
     "-r fExX",
     "--show-capture=all",
+    "--strict-markers",
 
     # Test collection
     "--import-mode=importlib",

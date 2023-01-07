@@ -83,6 +83,7 @@ class TestStartUrlAssembly:
         assert fixture_ans == set(result)
         assert fixture_ans == result
 
+    @pytest.mark.slow
     def test_concat_real_data(self, data_dir):
         # FIXME: STILL TAKES TOO LONG TO EXECUTE
         """test normal usage"""
