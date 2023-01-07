@@ -71,7 +71,7 @@ def handler_factory(handler_dict: dict[str, Url]):
 
 
 @pytest.fixture(scope="function")
-def site(request):
+def site_generator(request):
 
     def _site(name: str, pages: dict[str, Url]):
 
@@ -101,6 +101,11 @@ def site(request):
 
     return _site
 
+
+__all__ = [
+    "Url",
+    "site_generator",
+]
 
 if __name__ == "__main__":
     print(

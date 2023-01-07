@@ -5,10 +5,11 @@ import re
 import pytest
 import requests
 
+import mock.website
 import scraper
 
-mock = importlib.import_module("mock")
-mock_site = mock.site
+Url = mock.website.Url
+mock_site = mock.website.site_generator
 
 
 class TestMockSite:
@@ -24,14 +25,14 @@ class TestMockSite:
         main_site = mock_site(
             "main",
             {
-                "page1": (mock.Url("main", "page2"),),
-                "page2": (mock.Url("main", "page3"),),
+                "page1": (Url("main", "page2"),),
+                "page2": (Url("main", "page3"),),
                 "page3": (),
             },
         )
 
         for i in range(1, 4):
-            path = mock.Url("main", f"page{i}")
+            path = Url("main", f"page{i}")
             print(path, repr(path), str(path))
             r = requests.get(str(path), timeout=(0.1, 0.1))
 
@@ -58,7 +59,7 @@ class TestDownloader:
         main_site = mock_site(
             "main",
             {
-                "page1": (mock.Url("main", "page2")),
+                "page1": (Url("main", "page2")),
             },
         )
 
@@ -81,9 +82,9 @@ class TestCrawler:
         main_site = mock_site(
             "main",
             {
-                "page1": (mock.Url("main", "page2"), mock.Url("main", "page3")),
-                "page2": (mock.Url("main", "page4"),),
-                "page3": (mock.Url("main", "page5"),),
+                "page1": (Url("main", "page2"), Url("main", "page3")),
+                "page2": (Url("main", "page4"),),
+                "page3": (Url("main", "page5"),),
                 "page4": (),
                 "page5": (),
             },
@@ -103,7 +104,7 @@ class TestCrawler:
         main_site = mock_site(
             "main",
             {
-                "page1": (mock.Url("third_party_1", "page1")),
+                "page1": (Url("third_party_1", "page1")),
                 "page2": (),
             },
         )
@@ -111,8 +112,8 @@ class TestCrawler:
             "third_party_1",
             {
                 "page1": (
-                    mock.Url("third_party_1", "page2"),
-                    mock.Url("third_party_2", "page1"),
+                    Url("third_party_1", "page2"),
+                    Url("third_party_2", "page1"),
                 ),
                 "page2": (),
             },
@@ -126,7 +127,7 @@ class TestCrawler:
         third_party_site3 = mock_site(
             "third_party_3",
             {
-                "page1": (mock.Url("main", "page2")),
+                "page1": (Url("main", "page2")),
             },
         )
 
