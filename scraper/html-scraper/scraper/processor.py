@@ -18,12 +18,13 @@ class BaseWorker(abc.ABC):
         middleware: graphlib.TopologicalSorter | dict | tuple | list,
         n_worker: int = None,
     ):
+        # Sanitize middleware DAG
         if isinstance(middleware, graphlib.TopologicalSorter):
             pass
         elif isinstance(middleware, dict):
             middleware = graphlib.TopologicalSorter(middleware)
         elif isinstance(middleware, (list, tuple)):
-            # preserve original order
+            # Preserve original order
             mw_graph = graphlib.TopologicalSorter()
             if len(middleware) < 2:
                 mw_graph.add(middleware[0])
@@ -35,7 +36,7 @@ class BaseWorker(abc.ABC):
             middleware = graphlib.TopologicalSorter({})
         else:
             raise ValueError(
-                f"type of argument <middleware> is: {type(middleware)}")
+                f"type of argument <middleware>: {type(middleware)}")
 
         middleware.prepare()
         self.middleware = middleware

@@ -1,11 +1,10 @@
 import graphlib
-import importlib
 import re
 
+import mock.website
 import pytest
 import requests
 
-import mock.website
 import scraper
 
 Url = mock.website.Url

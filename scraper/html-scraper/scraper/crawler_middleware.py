@@ -62,7 +62,7 @@ class ThirdParty(Middleware):
 
     @staticmethod
     @tracer.start_as_current_span("get_registered_domain")
-    @functools.lru_cache
+    @functools.lru_cache  # FIXME: default size=128 will cause thrashing when target domains are distributed # TODO: tune size
     @tracer.start_as_current_span("get_registered_domain-cached")
     def get_registered_domain(url):
         # TODO: can we replace "tldextract"?

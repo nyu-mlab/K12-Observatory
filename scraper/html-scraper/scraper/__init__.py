@@ -2,7 +2,7 @@
 
 scrapes the internet
 """
-try:  # pragma: no cover
+try:
     from opentelemetry import trace
     from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
     import opentelemetry.sdk.resources
