@@ -4,10 +4,7 @@ scrapes the internet
 """
 try:  # pragma: no cover
     from opentelemetry import trace
-    if (use_grpc_instead_of_thrift := 0):
-        from opentelemetry.exporter.jaeger.proto.grpc import JaegerExporter
-    else:
-        from opentelemetry.exporter.jaeger.thrift import JaegerExporter
+    from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
     import opentelemetry.sdk.resources
     import opentelemetry.sdk.trace
     from opentelemetry.sdk.trace.export import (BatchSpanProcessor,
@@ -16,16 +13,10 @@ try:  # pragma: no cover
     otel_resource = opentelemetry.sdk.resources.Resource(attributes={
         opentelemetry.sdk.resources.SERVICE_NAME: "unittest",
     })
-    if use_grpc_instead_of_thrift:
-        jaeger_exporter = JaegerExporter(collector_endpoint="localhost:14250",
-                                         insecure=True)
-    else:
-        jaeger_exporter = JaegerExporter()
     otel_provider = opentelemetry.sdk.trace.TracerProvider(
         resource=otel_resource)  #TODO: explictly get AlwaysOnSampler
-    otel_processor = BatchSpanProcessor(jaeger_exporter)
-    # NOTE: use "OTEL_BSP_MAX_EXPORT_BATCH_SIZE=24 pytest" on macOS, or add "max_export_batch_size=24" to BatchSpanProcessor options, or alter MTU
-    #otel_processor = SimpleSpanProcessor(jaeger_exporter)
+    otel_exporter = OTLPSpanExporter()
+    otel_processor = BatchSpanProcessor(otel_exporter)
     otel_provider.add_span_processor(otel_processor)
     trace.set_tracer_provider(otel_provider)
 except ImportError as err:  # pragma: no cover
