@@ -137,4 +137,4 @@ class TestStartUrlAssembly:
                         math.log(TARGET_FALSE_POSITIVE_RATE,
                                  chance_of_original_order)),
                 ))):
-            raise RuntimeError()
+            raise RuntimeError
