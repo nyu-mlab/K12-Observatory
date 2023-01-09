@@ -19,8 +19,8 @@ class Scraper:
     ):
 
         # Piping scheduler, downloader, and crawler
-        crawler.task_queue = downloader.finish_queue
-        scheduler.task_queue = crawler.finish_queue
+        crawler.input_queue = downloader.output_queue
+        scheduler.input_queue = crawler.output_queue
 
         self.crawler = crawler
         self.downloader = downloader

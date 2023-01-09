@@ -1,4 +1,7 @@
+import concurrent.futures
 import graphlib
+import math
+import pathlib
 import re
 
 import mock.website
@@ -141,41 +144,92 @@ class TestScheduler:
     # TODO: queue persistence
 
 
+def is_prime(n: int):
+    if n < 2:
+        return False
+    elif n == 2:
+        return True
+    elif n % 2 == 0:
+        return False
+    else:
+        sqrt_n = int(math.floor(math.sqrt(n)))
+        for i in range(3, sqrt_n + 1, 2):
+            if n % i == 0:
+                return False
+        return True
+
+
 class TestWorker:
     # TODO: move to its own file
 
+    class BasicWorker(scraper.processor.BaseWorker):
+
+        def process(self, task):
+            # Look for primes
+            primes = {
+                112272535095293: True,
+                112582705942171: True,
+                115280095190773: True,
+                115797848077099: True,
+                1099726899285419: False,
+            }
+            with self.worker_pool as executor:
+                for number, prime_or_not in zip(primes,
+                                                executor.map(is_prime, primes)):
+                    assert primes[number] == prime_or_not
+
     def test_creation(self, monkeypatch):
         Worker = scraper.processor.BaseWorker
-        monkeypatch.setattr(Worker, "__abstractmethods__", frozenset())
-        # assert no exceptions when constructing with graph/dict/tuple/list
-        for mw in (
-                graphlib.TopologicalSorter({
+        worker_pool = concurrent.futures.ThreadPoolExecutor(max_workers=1)
+        with monkeypatch.context() as m:
+            m.setattr(Worker, "__abstractmethods__", frozenset())
+            # assert no exceptions when constructing with graph/dict/tuple/list
+            for mw in (
+                    graphlib.TopologicalSorter({
+                        scraper.crawler_middleware.Depth():
+                            (scraper.crawler_middleware.Referer(),),
+                    }),
+                {
                     scraper.crawler_middleware.Depth():
                         (scraper.crawler_middleware.Referer(),),
-                }),
-            {
-                scraper.crawler_middleware.Depth():
-                    (scraper.crawler_middleware.Referer(),),
-            },
-            (
-                scraper.crawler_middleware.Depth(),
-                scraper.crawler_middleware.Referer(),
-            ),
-            [
-                scraper.crawler_middleware.Depth(),
-                scraper.crawler_middleware.Referer(),
-            ],
-                tuple((scraper.crawler_middleware.Depth(),)),
-                list((scraper.crawler_middleware.Depth(),)),
-                None,
-            [],  # empty list
-            [1],  # list with one item
-        ):
-            Worker(middleware=mw, n_worker=None)
+                },
+                (
+                    scraper.crawler_middleware.Depth(),
+                    scraper.crawler_middleware.Referer(),
+                ),
+                [
+                    scraper.crawler_middleware.Depth(),
+                    scraper.crawler_middleware.Referer(),
+                ],
+                    tuple((scraper.crawler_middleware.Depth(),)),
+                    list((scraper.crawler_middleware.Depth(),)),
+                    None,
+                [],  # empty list
+                [1],  # list with one item
+            ):
+                Worker(mw, worker_pool)
 
-        # assert exceptions  # FIXME: is this necessary?
-        for mw in [
-                1,
-        ]:
-            with pytest.raises(ValueError, match=f"{type(mw)}"):
-                Worker(middleware=mw, n_worker=None)
+            # assert exceptions  # FIXME: is this necessary?
+            for mw in [
+                    1,
+            ]:
+                with pytest.raises(ValueError, match=f"{type(mw)}"):
+                    Worker(mw, worker_pool)
+
+    @pytest.mark.worker_pool
+    @pytest.mark.slow
+    def test_thread_workers(self):
+        worker_pool = concurrent.futures.ThreadPoolExecutor()
+        worker = self.BasicWorker([], worker_pool)
+        worker.process(None)
+
+    @pytest.mark.worker_pool
+    @pytest.mark.slow
+    def test_process_workers(self, monkeypatch):
+        # Requires the tests directory to be importable from PYTHON_PATH due to
+        # multiprocessing module pickling everything
+        with monkeypatch.context() as m:
+            m.syspath_prepend(pathlib.PurePath(__file__).parent.parent)
+            worker_pool = concurrent.futures.ProcessPoolExecutor()
+            worker = self.BasicWorker([], worker_pool)
+            worker.process(None)

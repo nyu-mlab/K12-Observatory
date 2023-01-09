@@ -1,6 +1,7 @@
 """ Building blocks
 """
 import abc
+import concurrent.futures
 import graphlib
 import itertools
 import multiprocessing as mp
@@ -16,7 +17,7 @@ class BaseWorker(abc.ABC):
     def __init__(
         self,
         middleware: graphlib.TopologicalSorter | dict | tuple | list,
-        n_worker: int = None,
+        worker_pool: concurrent.futures.Executor = None,
     ):
         # Sanitize middleware DAG
         if isinstance(middleware, graphlib.TopologicalSorter):
@@ -39,27 +40,20 @@ class BaseWorker(abc.ABC):
             raise ValueError(
                 f"type of argument <middleware>: {type(middleware)}")
 
+        if worker_pool is not None:
+            self.worker_pool = worker_pool
+        else:
+            self.worker_pool = concurrent.futures.ProcessPoolExecutor(
+                max_workers=None)
+
         middleware.prepare()
         self.middleware = middleware
-        self.task_queue = mp.Queue()
-        self.finished_queue = mp.Queue()
-        self.worker_pool = mp.Pool(processes=n_worker)
-
-    def run_forever(self):
-        while True:
-            self.worker_pool.apply_async(self.process,
-                                         self.task_queue.get(block=True))
+        self.input_queue = mp.Queue()
+        self.output_queue = mp.Queue()
 
     def shutdown(self):
-        # TODO: should we call .terminate() to stop immediately?
-        self.worker_pool.close()
-        self.worker_pool.join()
-
-    @classmethod
-    @abc.abstractmethod
-    def _process(cls, task: scraper.task.Task) -> scraper.task.Task:
-        raise NotImplementedError
+        self.worker.shutdown(wait=True, cancel_futures=True)
 
     @abc.abstractmethod
     def process(self, task: scraper.task.Task):
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
