@@ -101,7 +101,7 @@ class TestStartUrlAssembly:
 
     @pytest.mark.xfail(True,
                        raises=RuntimeError,
-                       reason="randomization makes it flaky",
+                       reason="randomization makes this flaky",
                        strict=False)
     def test_shuffle(self, random_str_group):
         # TODO: replace with 'hypothisis' library

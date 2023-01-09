@@ -240,7 +240,7 @@ class TestThirdPartyMiddleware:
         middleware.ThirdParty.process(third_party_task)
         assert len(third_party_task.results) == 0
 
-    @pytest.mark.skip("TODO")
+    @pytest.mark.skip("TODO: what's the desired behavior?")
     def test_filter_third_party_children_and_set_root_hostname_for_first_party_children_of_third_party_request(
             self, basic_task):
         """TODO: what's the desired behavior?"""
