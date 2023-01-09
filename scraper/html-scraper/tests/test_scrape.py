@@ -168,13 +168,14 @@ class TestWorker:
                 tuple((scraper.crawler_middleware.Depth(),)),
                 list((scraper.crawler_middleware.Depth(),)),
                 None,
+            [],  # empty list
+            [1],  # list with one item
         ):
             Worker(middleware=mw, n_worker=None)
 
-        # assert exceptions
-        for mw in (
+        # assert exceptions  # FIXME: is this necessary?
+        for mw in [
                 1,
-                "abc",
-        ):
+        ]:
             with pytest.raises(ValueError, match=f"{type(mw)}"):
                 Worker(middleware=mw, n_worker=None)

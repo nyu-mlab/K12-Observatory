@@ -26,9 +26,10 @@ class BaseWorker(abc.ABC):
         elif isinstance(middleware, (list, tuple)):
             # Preserve original order
             mw_graph = graphlib.TopologicalSorter()
-            if len(middleware) < 2:
+            if len(middleware) == 1:
                 mw_graph.add(middleware[0])
             else:
+                # pairwise(empty list or list with one item) returns nothing
                 for predecessor, node in itertools.pairwise(middleware):
                     mw_graph.add(node, predecessor)
             middleware = mw_graph
