@@ -47,5 +47,5 @@ jobs:
       - name: Test slow test suites
         working-directory: ./scraper/html-scraper/
         run: |
-          pytest -m "slow"
+          pytest -m "slow" --cov-append
         if: startsWith(matrix.os, 'ubuntu-')

@@ -76,10 +76,12 @@ addopts = [
 
 [tool.coverage.run]
 branch = true
+parallel = true
 concurrency = [
     "thread",
     "multiprocessing",
 ]
+dynamic_context = "test_function"
 cover_pylib = false
 omit = [
     "scraper/perf.py",
