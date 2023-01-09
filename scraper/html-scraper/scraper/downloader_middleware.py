@@ -6,6 +6,10 @@ import pathlib
 import urllib.parse
 
 import scraper.task
+from opentelemetry import trace
+
+tracer = trace.get_tracer(__name__)
+module_shortname = "downloader_mw" or __name__.rsplit(".", maxsplit=1)[-1]
 
 
 class Middleware(abc.ABC):
@@ -23,6 +27,8 @@ class HttpError(Middleware):
     """Filter out unsuccessful (erroneous) HTTP responses"""
 
     @classmethod
+    @tracer.start_as_current_span(module_shortname,
+                                  attributes=dict(middleware="http_status"))
     def process(cls, task):
         # TODO: do more checking for subcases?
         if not task.response.ok:
@@ -34,8 +40,10 @@ class JsCrawl(Middleware):
     # NOTE: REF: https://developers.google.com/search/docs/ajax-crawling/docs/getting-started
 
     @classmethod
-    def process(cls, task):  # pragma: no cover
-        pass
+    @tracer.start_as_current_span(module_shortname,
+                                  attributes=dict(middleware="js_render"))
+    def process(cls, task):
+        pass  # pragma: no cover
 
 
 class BinaryContent(Middleware):
@@ -47,6 +55,8 @@ class BinaryContent(Middleware):
     ]
 
     @classmethod
+    @tracer.start_as_current_span(module_shortname,
+                                  attributes=dict(middleware="binary_content"))
     def process(cls, task):
         resource_path = urllib.parse.urlparse(task.response.url).path
         resource_extension = pathlib.PurePath(resource_path).suffix
