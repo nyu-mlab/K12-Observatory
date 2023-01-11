@@ -85,7 +85,7 @@ def site_generator(request):
         print("Serving on port:", server.server_address[1])
 
         thread = threading.Thread(target=server.serve_forever,
-                                  kwargs=dict(poll_interval=0.1))
+                                  kwargs=dict(poll_interval=0.01))
         thread.start()
 
         def stop_server():
